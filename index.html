@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kerst Markt Motivatie</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{min-height:100%;font-family:Arial,sans-serif}
+body{
+  overflow-x:hidden;color:#fff;
+  background:linear-gradient(180deg,#07152f 0%,#102d52 48%,#244d68 100%);
+  min-height:100vh;
+}
+.sky{position:fixed;inset:0;overflow:hidden;pointer-events:none}
+.stars{position:absolute;inset:0;background-image:radial-gradient(#fff 1px,transparent 1px);background-size:90px 90px;opacity:.28}
+.moon{
+  position:absolute;right:9%;top:8%;width:110px;height:110px;border-radius:50%;
+  background:#fff7d6;box-shadow:0 0 45px rgba(255,247,214,.45)
+}
+.moon:after{content:"";position:absolute;background:#0b1d39;width:100px;height:100px;border-radius:50%;left:-24px;top:-10px}
+.snowflake{position:absolute;top:-30px;color:white;opacity:.85;animation:fall linear infinite}
+@keyframes fall{to{transform:translateY(110vh) rotate(360deg)}}
+header{position:relative;text-align:center;padding:75px 20px 35px;z-index:2}
+.badge{
+  display:inline-block;padding:8px 16px;border:1px solid rgba(255,255,255,.25);
+  border-radius:999px;background:rgba(255,255,255,.08);backdrop-filter:blur(6px);
+  font-size:14px;letter-spacing:2px;text-transform:uppercase
+}
+h1{
+  margin-top:18px;font-size:clamp(42px,8vw,86px);line-height:.95;
+  text-shadow:0 5px 25px rgba(0,0,0,.3)
+}
+.subtitle{margin:18px auto 0;max-width:650px;font-size:clamp(17px,2.5vw,22px);opacity:.88}
+main{position:relative;z-index:2;max-width:1000px;margin:auto;padding:20px}
+.card{
+  background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);
+  border-radius:28px;padding:32px;backdrop-filter:blur(12px);
+  box-shadow:0 20px 60px rgba(0,0,0,.18);text-align:center
+}
+.card h2{font-size:30px;margin-bottom:12px}
+.card p{font-size:17px;line-height:1.6;opacity:.9}
+.buttons{display:flex;justify-content:center;gap:14px;flex-wrap:wrap;margin-top:24px}
+.btn{
+  border:0;border-radius:14px;padding:14px 22px;font-size:16px;font-weight:bold;
+  cursor:pointer;transition:.2s;text-decoration:none;display:inline-block
+}
+.btn:hover{transform:translateY(-3px) scale(1.02)}
+.primary{background:#fff;color:#102d52}
+.secondary{background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.25)}
+.trees{
+  position:relative;height:190px;margin-top:30px;display:flex;align-items:end;
+  justify-content:space-around;max-width:900px;margin-left:auto;margin-right:auto
+}
+.tree{position:relative;width:0;height:0;border-left:65px solid transparent;border-right:65px solid transparent;border-bottom:120px solid #0b4939}
+.tree:before{content:"";position:absolute;left:-52px;top:35px;border-left:52px solid transparent;border-right:52px solid transparent;border-bottom:90px solid #0d6045}
+.tree:after{content:"";position:absolute;left:-38px;top:80px;border-left:38px solid transparent;border-right:38px solid transparent;border-bottom:65px solid #117653}
+.trunk{position:absolute;z-index:-1;width:24px;height:45px;background:#6b4028;left:-12px;top:115px}
+.star{position:absolute;z-index:3;left:-12px;top:-23px;color:#ffe9a3;font-size:27px}
+.ornament{position:absolute;z-index:4;width:10px;height:10px;border-radius:50%;background:#f5d77a}
+.tree.small{transform:scale(.72);margin-bottom:-15px}.tree.tiny{transform:scale(.52);margin-bottom:-35px}
+.ground{height:100px;background:linear-gradient(180deg,rgba(255,255,255,.9),rgba(220,239,245,.95));border-radius:50% 50% 0 0;margin-top:-12px}
+footer{position:relative;z-index:2;text-align:center;padding:18px 20px 35px;color:rgba(255,255,255,.65);font-size:13px}
+.sparkle{display:inline-block;animation:pulse 1.7s ease-in-out infinite}
+@keyframes pulse{50%{transform:scale(1.25);opacity:.65}}
+@media(max-width:600px){header{padding-top:55px}.card{padding:25px 18px}.trees{height:145px}.tree{transform:scale(.72)}.tree.small{display:none}}
+</style>
+</head>
+<body>
+<div class="sky" aria-hidden="true">
+  <div class="stars"></div><div class="moon"></div>
+</div>
+
+<header>
+  <div class="badge">✦ Kerstmarkt ✦</div>
+  <h1>Kerst Markt<br>Motivatie</h1>
+  <p class="subtitle">Samen maken we er een warme, gezellige en onvergetelijke kerstmarkt van.</p>
+</header>
+
+<main>
+  <section class="card">
+    <h2>🎄 Tijd om ervoor te gaan!</h2>
+    <p>
+      Een kerstmarkt wordt pas echt leuk als iedereen meedoet.
+      Met goede ideeën, energie en een beetje kerstmagie maken we er samen iets moois van.
+    </p>
+    <div class="buttons">
+      <button class="btn primary" onclick="motivate()">✨ Geef motivatie</button>
+      <button class="btn secondary" onclick="snow()">❄️ Meer sneeuw</button>
+    </div>
+    <div id="message" style="margin-top:18px;font-weight:bold;min-height:24px"></div>
+  </section>
+
+  <div class="trees" aria-hidden="true">
+    <div class="tree tiny"><div class="trunk"></div><div class="star">★</div></div>
+    <div class="tree"><div class="trunk"></div><div class="star">★</div><i class="ornament" style="left:-35px;top:42px"></i><i class="ornament" style="left:20px;top:70px"></i></div>
+    <div class="tree small"><div class="trunk"></div><div class="star">★</div></div>
+    <div class="tree"><div class="trunk"></div><div class="star">★</div><i class="ornament" style="left:-5px;top:55px"></i></div>
+    <div class="tree tiny"><div class="trunk"></div><div class="star">★</div></div>
+  </div>
+</main>
+<div class="ground"></div>
+<footer><span class="sparkle">✦</span> Fijne feestdagen! <span class="sparkle">✦</span></footer>
+
+<script>
+const messages=[
+  "Kom op, we kunnen dit! 🎄",
+  "Samen maken we de kerstmarkt geweldig! ✨",
+  "Kerstmodus: AAN. ❄️",
+  "Nog even knallen en dan genieten! 🎅",
+  "Iedereen draagt iets bij. Samen wordt het groot! ⭐"
+];
+function motivate(){
+  document.getElementById("message").textContent=messages[Math.floor(Math.random()*messages.length)];
+}
+function snow(){
+  for(let i=0;i<35;i++){
+    const s=document.createElement("div");
+    s.className="snowflake";
+    s.textContent=["❄","•","✦"][Math.floor(Math.random()*3)];
+    s.style.left=Math.random()*100+"vw";
+    s.style.fontSize=(8+Math.random()*16)+"px";
+    s.style.animationDuration=(3+Math.random()*5)+"s";
+    s.style.animationDelay=Math.random()*2+"s";
+    document.querySelector(".sky").appendChild(s);
+    setTimeout(()=>s.remove(),9000);
+  }
+}
+for(let i=0;i<55;i++){
+  const s=document.createElement("div");
+  s.className="snowflake";
+  s.textContent="❄";
+  s.style.left=Math.random()*100+"vw";
+  s.style.fontSize=(8+Math.random()*13)+"px";
+  s.style.animationDuration=(5+Math.random()*8)+"s";
+  s.style.animationDelay=(-Math.random()*12)+"s";
+  document.querySelector(".sky").appendChild(s);
+}
+</script>
+</body>
+</html>
