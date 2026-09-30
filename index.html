@@ -108,13 +108,14 @@ body{
 }
 .roof{
   position:absolute;
-  left:-5%;
-  top:-54%;
-  width:110%;
-  height:54%;
+  left:-4%;
+  top:-48%;
+  width:108%;
+  height:53%;
   background:linear-gradient(180deg,#415b70 0%,#2d4558 48%,#1a3042 100%);
   clip-path:polygon(50% 0,100% 100%,0 100%);
   filter:drop-shadow(0 5px 5px rgba(0,0,0,.34));
+  z-index:2;
 }
 .roof:before{
   content:"";
@@ -133,17 +134,17 @@ body{
   left:0;
   right:0;
   bottom:0;
-  height:8%;
-  background:linear-gradient(180deg,rgba(12,28,42,.12),rgba(8,21,33,.45));
+  height:9%;
+  background:linear-gradient(180deg,rgba(12,28,42,.12),rgba(8,21,33,.48));
 }
 .chimney{
-  position:absolute;right:17%;top:-34%;width:9%;height:37%;
+  position:absolute;right:17%;top:-18%;width:9%;height:24%;
   min-width:8px;background:linear-gradient(90deg,#243643,#3b4c55,#1e2d36);
   border-radius:2px 2px 0 0;
-  z-index:-1;
+  z-index:1;
 }
 .chimney:after{
-  content:"";position:absolute;left:-14%;top:-4px;width:128%;height:5px;
+  content:"";position:absolute;left:-12%;top:-3px;width:124%;height:4px;
   border-radius:2px;background:#dce8ea;
 }
 .window{
