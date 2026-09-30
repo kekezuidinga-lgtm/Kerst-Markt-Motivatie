@@ -605,7 +605,7 @@ body{
 </head>
 <body>
 <div class="scene">
-  <div class="meta"><div class="version">v1.1.5</div><div class="creator">Gemaakt door Keke Zuidinga</div></div>
+  <div class="meta"><div class="version">v1.1.6</div><div class="creator">Gemaakt door Keke Zuidinga</div></div>
   <div class="editor-overlay" id="editorOverlay" aria-hidden="true">
     <div class="editor-panel" role="dialog" aria-modal="true" aria-labelledby="editorHeading">
       <div class="editor-header">
@@ -720,10 +720,27 @@ const pageCount=document.getElementById("pageCount");
 const editorToolbar=document.getElementById("editorToolbar");
 const editorStatus=document.getElementById("editorStatus");
 
+const fixedWelcome={
+  title:"Kerst Markt Motivatie",
+  message:"Welkom dit is mijn kerst markt motiviatie. Ik ben Keke Zuidinga (443325) en hier leg ik uit wat mijn motivatie is om mee te gaan naar de kerst markt. Deze website heb ik helemaal zelf gecodeerd op GitHub alles wat je ziet heb ik gemaakt."
+};
+
 const defaultMotivation=[{
   title:"test1",
   message:"test2"
 }];
+
+function isWelcomePage(page){
+  if(!page||typeof page.title!=="string"||typeof page.message!=="string") return false;
+  const plainTitle=page.title.replace(/<[^>]*>/g,"").replace(/&nbsp;/g," ").trim();
+  const plainMessage=page.message.replace(/<[^>]*>/g,"").replace(/&nbsp;/g," ").trim();
+  return plainTitle===fixedWelcome.title && plainMessage.startsWith("Welkom dit is mijn kerst markt motiviatie.");
+}
+
+function removeWelcomePages(input){
+  const result=(Array.isArray(input)?input:[]).filter(page=>!isWelcomePage(page));
+  return result.length?result:clonePages(defaultMotivation);
+}
 
 let pages=[];
 let currentPage=0;
@@ -938,20 +955,14 @@ async function loadSavedData(){
     .sort((a,b)=>String(b.savedAt).localeCompare(String(a.savedAt)));
 
   const source=candidates[0];
-  pages=source?clonePages(source.pages):clonePages(defaultMotivation);
+  const rawPages=source?clonePages(source.pages):clonePages(defaultMotivation);
+  pages=removeWelcomePages(rawPages);
 
-  // The welcome card is fixed and must never become an editable motivation page.
-  // Older versions accidentally stored the welcome card as page 1.
-  const welcomeTitle="Kerst Markt Motivatie";
-  const welcomeStart="Welkom dit is mijn kerst markt motiviatie.";
-  if(
-    pages[0] &&
-    pages[0].title.trim()===welcomeTitle &&
-    pages[0].message.trim().startsWith(welcomeStart)
-  ){
-    pages[0]=clonePages(defaultMotivation)[0];
-    persistPages();
-    await saveNow("Welkomstpagina losgekoppeld van motivatie");
+  // Keep the fixed welcome card completely outside the editable motivation data.
+  if(JSON.stringify(rawPages)!==JSON.stringify(pages)){
+    localSave();
+    await addBackup({savedAt:timestamp(),pages:clonePages(pages)});
+    await writeCacheBackup();
   }
 }
 
@@ -1001,9 +1012,8 @@ function syncEditorToPage(){
 }
 
 function openEditor(){
-  // The editor is only available from the welcome screen.
-  // Once the motivation is opened, the public pages are read-only.
-  if(motivationStarted) return;
+  // Ctrl+K edits motivation pages only. The welcome card is fixed HTML.
+  currentPage=0;
   editorSnapshot=JSON.stringify(pages);
   loadEditorPage();
   editorOverlay.classList.add("open");
@@ -1089,14 +1099,15 @@ nextPageButton.addEventListener("click",()=>{
 
 document.getElementById("saveEditor").addEventListener("click",async()=>{
   syncEditorToPage();
+  pages=removeWelcomePages(pages);
   await saveNow("Opgeslagen");
-  renderMotivationPage(0);
+  showIntro();
   closeEditor();
 });
 
 document.getElementById("cancelEditor").addEventListener("click",()=>{
-  pages=JSON.parse(editorSnapshot);
-  renderMotivationPage(0);
+  pages=removeWelcomePages(JSON.parse(editorSnapshot));
+  showIntro();
   closeEditor();
 });
 
@@ -1104,7 +1115,7 @@ document.getElementById("downloadBackup").addEventListener("click",()=>{
   syncEditorToPage();
   const payload={
     app:"Kerst Markt Motivatie",
-    version:"v1.1.5",
+    version:"v1.1.6",
     exportedAt:timestamp(),
     pages:clonePages(pages)
   };
@@ -1151,11 +1162,11 @@ editorOverlay.addEventListener("mousedown",event=>{
 document.addEventListener("keydown",event=>{
   if((event.ctrlKey||event.metaKey)&&event.key.toLowerCase()==="k"){
     event.preventDefault();
-    if(!motivationStarted) openEditor();
+    openEditor();
     return;
   }
   if(event.key==="Escape"&&editorOverlay.classList.contains("open")){
-    pages=JSON.parse(editorSnapshot);
+    pages=removeWelcomePages(JSON.parse(editorSnapshot));
     showIntro();
     closeEditor();
   }
