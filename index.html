@@ -605,7 +605,7 @@ body{
 </head>
 <body>
 <div class="scene">
-  <div class="meta"><div class="version">v1.1.3</div><div class="creator">Gemaakt door Keke Zuidinga</div></div>
+  <div class="meta"><div class="version">v1.1.4</div><div class="creator">Gemaakt door Keke Zuidinga</div></div>
   <div class="editor-overlay" id="editorOverlay" aria-hidden="true">
     <div class="editor-panel" role="dialog" aria-modal="true" aria-labelledby="editorHeading">
       <div class="editor-header">
@@ -992,7 +992,9 @@ function syncEditorToPage(){
 }
 
 function openEditor(){
-  if(!motivationStarted) renderMotivationPage(0);
+  // The editor is only available from the welcome screen.
+  // Once the motivation is opened, the public pages are read-only.
+  if(motivationStarted) return;
   editorSnapshot=JSON.stringify(pages);
   loadEditorPage();
   editorOverlay.classList.add("open");
@@ -1093,7 +1095,7 @@ document.getElementById("downloadBackup").addEventListener("click",()=>{
   syncEditorToPage();
   const payload={
     app:"Kerst Markt Motivatie",
-    version:"v1.1.3",
+    version:"v1.1.4",
     exportedAt:timestamp(),
     pages:clonePages(pages)
   };
@@ -1140,12 +1142,12 @@ editorOverlay.addEventListener("mousedown",event=>{
 document.addEventListener("keydown",event=>{
   if((event.ctrlKey||event.metaKey)&&event.key.toLowerCase()==="k"){
     event.preventDefault();
-    openEditor();
+    if(!motivationStarted) openEditor();
     return;
   }
   if(event.key==="Escape"&&editorOverlay.classList.contains("open")){
     pages=JSON.parse(editorSnapshot);
-    renderMotivationPage(0);
+    showIntro();
     closeEditor();
   }
 });
