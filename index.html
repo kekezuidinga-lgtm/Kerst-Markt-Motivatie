@@ -538,6 +538,31 @@ body{
   .editor-message-editor{min-height:180px}
 }
 
+.editor-status{
+  margin-top:12px;
+  min-height:18px;
+  color:#91a1a8;
+  font-size:12px;
+}
+.editor-backup-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:12px;
+}
+.editor-backup-row button{
+  border:1px solid rgba(255,255,255,.10);
+  border-radius:7px;
+  padding:7px 10px;
+  color:#cbd6da;
+  background:#162631;
+  font:600 12px Arial,sans-serif;
+  cursor:pointer;
+}
+.editor-backup-row button:hover{background:#213744}
+
 .meta{
   position:absolute;
   top:22px;
@@ -580,7 +605,7 @@ body{
 </head>
 <body>
 <div class="scene">
-  <div class="meta"><div class="version">v1.1.1</div><div class="creator">Gemaakt door Keke Zuidinga</div></div>
+  <div class="meta"><div class="version">v1.1.2</div><div class="creator">Gemaakt door Keke Zuidinga</div></div>
   <div class="editor-overlay" id="editorOverlay" aria-hidden="true">
     <div class="editor-panel" role="dialog" aria-modal="true" aria-labelledby="editorHeading">
       <div class="editor-header">
@@ -632,6 +657,14 @@ body{
           </div>
         </div>
 
+        <div class="editor-backup-row">
+          <span class="editor-status" id="editorStatus">Automatisch opslaan staat aan.</span>
+          <span>
+            <button type="button" id="downloadBackup">Download backup</button>
+            <button type="button" id="importBackup">Importeer backup</button>
+            <input type="file" id="backupFile" accept=".json,application/json" hidden>
+          </span>
+        </div>
         <div class="editor-actions">
           <button type="button" class="cancel" id="cancelEditor">Annuleren</button>
           <button type="button" class="save" id="saveEditor">Opslaan</button>
@@ -685,43 +718,205 @@ const editorTitle=document.getElementById("editorTitle");
 const editorMessage=document.getElementById("editorMessage");
 const pageCount=document.getElementById("pageCount");
 const editorToolbar=document.getElementById("editorToolbar");
+const editorStatus=document.getElementById("editorStatus");
 
-const defaultPages=[{
-  title:"Kerst Markt Motivatie",
-  message:"Welkom dit is mijn kerst markt motiviatie. Ik ben Keke Zuidinga (443325) en hier leg ik uit wat mijn motivatie is om mee te gaan naar de kerst markt. Deze website heb ik helemaal zelf gecodeerd op GitHub alles wat je ziet heb ik gemaakt."
+const defaultMotivation=[{
+  title:"test1",
+  message:"test2"
 }];
 
 let pages=[];
 let currentPage=0;
-let savedSnapshot="";
 let activeEditor=editorMessage;
+let editorSnapshot="";
+let motivationStarted=false;
+let saveTimer=null;
+let db=null;
 
-function loadPages(){
+const STORAGE_KEY="kerstMarktMotivatie_v2";
+const DB_NAME="KerstMarktMotivatieBackup";
+const DB_VERSION=1;
+const STORE="snapshots";
+const MAX_BACKUPS=10;
+
+function clonePages(value){
+  return JSON.parse(JSON.stringify(value));
+}
+
+function validPages(value){
+  return Array.isArray(value)&&value.length>0&&value.every(page =>
+    page && typeof page.title==="string" && typeof page.message==="string"
+  );
+}
+
+function timestamp(){
+  return new Date().toISOString();
+}
+
+function setStatus(message){
+  if(editorStatus) editorStatus.textContent=message;
+}
+
+function localSave(){
   try{
-    const stored=localStorage.getItem("kerstMarktMotivatiePages");
-    const parsed=stored?JSON.parse(stored):null;
-    pages=Array.isArray(parsed)&&parsed.length?parsed:structuredClone(defaultPages);
+    const payload={
+      savedAt:timestamp(),
+      pages:clonePages(pages)
+    };
+    localStorage.setItem(STORAGE_KEY,JSON.stringify(payload));
+    return true;
   }catch{
-    pages=structuredClone(defaultPages);
+    return false;
   }
 }
 
-function persistPages(){
-  localStorage.setItem("kerstMarktMotivatiePages",JSON.stringify(pages));
+function openDatabase(){
+  return new Promise(resolve=>{
+    try{
+      const request=indexedDB.open(DB_NAME,DB_VERSION);
+      request.onupgradeneeded=event=>{
+        const database=event.target.result;
+        if(!database.objectStoreNames.contains(STORE)){
+          const store=database.createObjectStore(STORE,{keyPath:"id",autoIncrement:true});
+          store.createIndex("savedAt","savedAt");
+        }
+      };
+      request.onsuccess=event=>{
+        db=event.target.result;
+        resolve(db);
+      };
+      request.onerror=()=>resolve(null);
+    }catch{
+      resolve(null);
+    }
+  });
 }
 
-function renderPage(index=currentPage){
+function addBackup(snapshot){
+  return new Promise(resolve=>{
+    if(!db){resolve(false);return}
+    try{
+      const tx=db.transaction(STORE,"readwrite");
+      tx.objectStore(STORE).add(snapshot);
+      tx.oncomplete=async()=>{
+        await trimBackups();
+        resolve(true);
+      };
+      tx.onerror=()=>resolve(false);
+    }catch{
+      resolve(false);
+    }
+  });
+}
+
+function trimBackups(){
+  return new Promise(resolve=>{
+    if(!db){resolve();return}
+    try{
+      const tx=db.transaction(STORE,"readwrite");
+      const store=tx.objectStore(STORE);
+      const request=store.getAll();
+      request.onsuccess=()=>{
+        const items=request.result.sort((a,b)=>String(b.savedAt).localeCompare(String(a.savedAt)));
+        for(const item of items.slice(MAX_BACKUPS)) store.delete(item.id);
+      };
+      tx.oncomplete=()=>resolve();
+      tx.onerror=()=>resolve();
+    }catch{
+      resolve();
+    }
+  });
+}
+
+function newestIndexedBackup(){
+  return new Promise(resolve=>{
+    if(!db){resolve(null);return}
+    try{
+      const tx=db.transaction(STORE,"readonly");
+      const request=tx.objectStore(STORE).getAll();
+      request.onsuccess=()=>{
+        const items=request.result
+          .filter(item=>validPages(item.pages))
+          .sort((a,b)=>String(b.savedAt).localeCompare(String(a.savedAt)));
+        resolve(items[0]||null);
+      };
+      request.onerror=()=>resolve(null);
+    }catch{
+      resolve(null);
+    }
+  });
+}
+
+function readLocal(){
+  try{
+    const raw=localStorage.getItem(STORAGE_KEY);
+    if(!raw) return null;
+    const payload=JSON.parse(raw);
+    return validPages(payload.pages)?payload:null;
+  }catch{
+    return null;
+  }
+}
+
+async function saveNow(reason="Automatisch opgeslagen"){
+  const clean=clonePages(pages);
+  const savedAt=timestamp();
+  const payload={savedAt,pages:clean};
+  const localOk=localSave();
+  const backupOk=await addBackup(payload);
+
+  if(editorOverlay.classList.contains("open")){
+    if(localOk&&backupOk) setStatus(reason+" • lokaal + backup opgeslagen");
+    else if(localOk) setStatus(reason+" • lokaal opgeslagen; backup-opslag niet beschikbaar");
+    else setStatus("Opslaan mislukt. Gebruik Download backup.");
+  }
+}
+
+function scheduleSave(){
+  clearTimeout(saveTimer);
+  saveTimer=setTimeout(()=>saveNow("Automatisch opgeslagen"),350);
+}
+
+async function loadSavedData(){
+  const local=readLocal();
+  const indexed=await newestIndexedBackup();
+
+  let source=null;
+  if(local&&indexed){
+    source=String(local.savedAt)>=String(indexed.savedAt)?local:indexed;
+  }else{
+    source=local||indexed;
+  }
+
+  pages=source&&validPages(source.pages)?clonePages(source.pages):clonePages(defaultMotivation);
+}
+
+async function requestPersistentStorage(){
+  try{
+    if(navigator.storage&&navigator.storage.persist){
+      await navigator.storage.persist();
+    }
+  }catch{}
+}
+
+function showIntro(){
+  motivationStarted=false;
+  currentPage=0;
+  noteTitle.textContent="Kerst Markt Motivatie";
+  noteText.textContent="Welkom dit is mijn kerst markt motiviatie. Ik ben Keke Zuidinga (443325) en hier leg ik uit wat mijn motivatie is om mee te gaan naar de kerst markt. Deze website heb ik helemaal zelf gecodeerd op GitHub alles wat je ziet heb ik gemaakt.";
+  motivationButton.style.display="inline-block";
+  nextPageButton.style.display="none";
+}
+
+function renderMotivationPage(index=currentPage){
+  motivationStarted=true;
   if(!pages[index]) index=0;
   currentPage=index;
+
   noteTitle.innerHTML=pages[currentPage].title||"";
   noteText.innerHTML=pages[currentPage].message||"";
-
-  const hasNext=pages.length>currentPage+1;
-  nextPageButton.style.display=hasNext?"inline-block":"none";
-
-  if(motivationButton){
-    motivationButton.style.display=currentPage===0&&pages.length===1?"inline-block":"none";
-  }
+  motivationButton.style.display="none";
+  nextPageButton.style.display=pages.length>currentPage+1?"inline-block":"none";
 }
 
 function loadEditorPage(){
@@ -738,14 +933,16 @@ function syncEditorToPage(){
   if(!pages[currentPage]) return;
   pages[currentPage].title=editorTitle.innerHTML;
   pages[currentPage].message=editorMessage.innerHTML;
+  scheduleSave();
 }
 
 function openEditor(){
-  savedSnapshot=JSON.stringify(pages);
-  currentPage=Math.min(currentPage,pages.length-1);
+  if(!motivationStarted) renderMotivationPage(0);
+  editorSnapshot=JSON.stringify(pages);
   loadEditorPage();
   editorOverlay.classList.add("open");
   editorOverlay.setAttribute("aria-hidden","false");
+  setStatus("Automatisch opslaan staat aan.");
   setTimeout(()=>editorTitle.focus(),30);
 }
 
@@ -765,45 +962,43 @@ function execFormat(command,value=null){
 
 editorTitle.addEventListener("focus",()=>activeEditor=editorTitle);
 editorMessage.addEventListener("focus",()=>activeEditor=editorMessage);
-
 editorTitle.addEventListener("input",syncEditorToPage);
 editorMessage.addEventListener("input",syncEditorToPage);
 
-editorToolbar.addEventListener("mousedown",(event)=>{
+editorToolbar.addEventListener("mousedown",event=>{
   const target=event.target.closest("button,select");
   if(!target) return;
   if(target.tagName==="BUTTON") event.preventDefault();
 });
 
-editorToolbar.addEventListener("click",(event)=>{
+editorToolbar.addEventListener("click",event=>{
   const button=event.target.closest("button[data-cmd]");
   if(button) execFormat(button.dataset.cmd);
 });
 
-document.getElementById("fontFamilyControl").addEventListener("change",(event)=>{
+document.getElementById("fontFamilyControl").addEventListener("change",event=>{
   execFormat("fontName",event.target.value);
 });
-
-document.getElementById("fontSizeControl").addEventListener("change",(event)=>{
+document.getElementById("fontSizeControl").addEventListener("change",event=>{
   execFormat("fontSize",event.target.value);
 });
 
 document.getElementById("addEditorPage").addEventListener("click",()=>{
   syncEditorToPage();
-  pages.push({
-    title:"Nieuwe pagina",
-    message:"Schrijf hier je motivatie..."
-  });
+  pages.push({title:"Nieuwe pagina",message:"Schrijf hier je motivatie..."});
   currentPage=pages.length-1;
   loadEditorPage();
   editorTitle.focus();
+  saveNow("Nieuwe pagina opgeslagen");
 });
 
 document.getElementById("deleteEditorPage").addEventListener("click",()=>{
   if(pages.length===1) return;
+  syncEditorToPage();
   pages.splice(currentPage,1);
-  currentPage=Math.max(0,currentPage-1);
+  currentPage=Math.min(currentPage,pages.length-1);
   loadEditorPage();
+  saveNow("Pagina verwijderd en backup gemaakt");
 });
 
 document.getElementById("prevEditorPage").addEventListener("click",()=>{
@@ -823,50 +1018,108 @@ document.getElementById("nextEditorPage").addEventListener("click",()=>{
 });
 
 nextPageButton.addEventListener("click",()=>{
-  if(currentPage<pages.length-1) renderPage(currentPage+1);
+  if(currentPage<pages.length-1) renderMotivationPage(currentPage+1);
 });
 
-document.getElementById("saveEditor").addEventListener("click",()=>{
+document.getElementById("saveEditor").addEventListener("click",async()=>{
   syncEditorToPage();
-  persistPages();
-  renderPage(0);
+  await saveNow("Opgeslagen");
+  renderMotivationPage(0);
   closeEditor();
 });
 
 document.getElementById("cancelEditor").addEventListener("click",()=>{
-  pages=JSON.parse(savedSnapshot);
-  renderPage(0);
+  pages=JSON.parse(editorSnapshot);
+  renderMotivationPage(0);
   closeEditor();
 });
 
-editorOverlay.addEventListener("mousedown",(event)=>{
+document.getElementById("downloadBackup").addEventListener("click",()=>{
+  syncEditorToPage();
+  const payload={
+    app:"Kerst Markt Motivatie",
+    version:"v1.1.2",
+    exportedAt:timestamp(),
+    pages:clonePages(pages)
+  };
+  const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");
+  a.href=url;
+  a.download="kerst-markt-motivatie-backup-"+new Date().toISOString().slice(0,10)+".json";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+  setStatus("Backup gedownload.");
+});
+
+const backupFile=document.getElementById("backupFile");
+document.getElementById("importBackup").addEventListener("click",()=>backupFile.click());
+
+backupFile.addEventListener("change",event=>{
+  const file=event.target.files&&event.target.files[0];
+  if(!file) return;
+  const reader=new FileReader();
+  reader.onload=async()=>{
+    try{
+      const imported=JSON.parse(reader.result);
+      if(!validPages(imported.pages)) throw new Error("Ongeldige backup");
+      pages=clonePages(imported.pages);
+      currentPage=0;
+      loadEditorPage();
+      await saveNow("Backup geïmporteerd en opnieuw opgeslagen");
+    }catch{
+      setStatus("Deze backup kon niet worden geladen.");
+    }finally{
+      backupFile.value="";
+    }
+  };
+  reader.readAsText(file);
+});
+
+editorOverlay.addEventListener("mousedown",event=>{
   if(event.target===editorOverlay) closeEditor();
 });
 
-document.addEventListener("keydown",(event)=>{
+document.addEventListener("keydown",event=>{
   if((event.ctrlKey||event.metaKey)&&event.key.toLowerCase()==="k"){
     event.preventDefault();
     openEditor();
     return;
   }
   if(event.key==="Escape"&&editorOverlay.classList.contains("open")){
-    pages=JSON.parse(savedSnapshot);
-    renderPage(0);
+    pages=JSON.parse(editorSnapshot);
+    renderMotivationPage(0);
     closeEditor();
   }
 });
 
-loadPages();
-renderPage(0);
+window.addEventListener("pagehide",()=>{
+  try{
+    clearTimeout(saveTimer);
+    localSave();
+  }catch{}
+});
 
-if(motivationButton){
-  motivationButton.addEventListener("click",()=>{
-    noteTitle.textContent="test1";
-    noteText.textContent="test2";
-    motivationButton.style.display="none";
-    nextPageButton.style.display="none";
-  });
-}
+window.addEventListener("beforeunload",()=>{
+  try{
+    clearTimeout(saveTimer);
+    localSave();
+  }catch{}
+});
+
+motivationButton.addEventListener("click",async()=>{
+  renderMotivationPage(0);
+  await saveNow("Motivatie geopend en opgeslagen");
+});
+
+(async()=>{
+  await openDatabase();
+  await requestPersistentStorage();
+  await loadSavedData();
+  showIntro();
+})();
 </script>
 
 <script>
