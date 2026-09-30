@@ -605,7 +605,7 @@ body{
 </head>
 <body>
 <div class="scene">
-  <div class="meta"><div class="version">v1.1.2</div><div class="creator">Gemaakt door Keke Zuidinga</div></div>
+  <div class="meta"><div class="version">v1.1.3</div><div class="creator">Gemaakt door Keke Zuidinga</div></div>
   <div class="editor-overlay" id="editorOverlay" aria-hidden="true">
     <div class="editor-panel" role="dialog" aria-modal="true" aria-labelledby="editorHeading">
       <div class="editor-header">
@@ -734,6 +734,9 @@ let saveTimer=null;
 let db=null;
 
 const STORAGE_KEY="kerstMarktMotivatie_v2";
+const LEGACY_STORAGE_KEY="kerstMarktMotivatiePages";
+const CACHE_NAME="kerstMarktMotivatieBackupCache";
+const CACHE_KEY="/__kerst_motivatie_backup__.json";
 const DB_NAME="KerstMarktMotivatieBackup";
 const DB_VERSION=1;
 const STORE="snapshots";
@@ -864,10 +867,12 @@ async function saveNow(reason="Automatisch opgeslagen"){
   const payload={savedAt,pages:clean};
   const localOk=localSave();
   const backupOk=await addBackup(payload);
+  const cacheOk=await writeCacheBackup();
 
   if(editorOverlay.classList.contains("open")){
-    if(localOk&&backupOk) setStatus(reason+" • lokaal + backup opgeslagen");
-    else if(localOk) setStatus(reason+" • lokaal opgeslagen; backup-opslag niet beschikbaar");
+    if(localOk&&backupOk&&cacheOk) setStatus(reason+" • 3 browser-backups opgeslagen");
+    else if(localOk&&backupOk) setStatus(reason+" • 2 browser-backups opgeslagen");
+    else if(localOk) setStatus(reason+" • lokaal opgeslagen; maak ook een download-backup");
     else setStatus("Opslaan mislukt. Gebruik Download backup.");
   }
 }
@@ -877,18 +882,68 @@ function scheduleSave(){
   saveTimer=setTimeout(()=>saveNow("Automatisch opgeslagen"),350);
 }
 
+async function readCacheBackup(){
+  try{
+    if(!("caches" in window)) return null;
+    const cache=await caches.open(CACHE_NAME);
+    const response=await cache.match(CACHE_KEY);
+    if(!response) return null;
+    const payload=await response.json();
+    return validPages(payload.pages)?payload:null;
+  }catch{
+    return null;
+  }
+}
+
+async function writeCacheBackup(){
+  try{
+    if(!("caches" in window)) return false;
+    const cache=await caches.open(CACHE_NAME);
+    const payload={
+      savedAt:timestamp(),
+      pages:clonePages(pages)
+    };
+    await cache.put(
+      CACHE_KEY,
+      new Response(JSON.stringify(payload),{
+        headers:{"Content-Type":"application/json"}
+      })
+    );
+    return true;
+  }catch{
+    return false;
+  }
+}
+
+function readLegacyPages(){
+  try{
+    const raw=localStorage.getItem(LEGACY_STORAGE_KEY);
+    if(!raw) return null;
+    const parsed=JSON.parse(raw);
+    return validPages(parsed)?{savedAt:"1970-01-01T00:00:00.000Z",pages:parsed}:null;
+  }catch{
+    return null;
+  }
+}
+
 async function loadSavedData(){
   const local=readLocal();
   const indexed=await newestIndexedBackup();
+  const cached=await readCacheBackup();
+  const legacy=readLegacyPages();
 
-  let source=null;
-  if(local&&indexed){
-    source=String(local.savedAt)>=String(indexed.savedAt)?local:indexed;
-  }else{
-    source=local||indexed;
+  const candidates=[local,indexed,cached,legacy]
+    .filter(Boolean)
+    .filter(item=>validPages(item.pages))
+    .sort((a,b)=>String(b.savedAt).localeCompare(String(a.savedAt)));
+
+  const source=candidates[0];
+  pages=source?clonePages(source.pages):clonePages(defaultMotivation);
+
+  // Migrate older saved motivations into the new redundant storage system.
+  if(legacy&&source===legacy){
+    await saveNow("Oude motivatie gemigreerd");
   }
-
-  pages=source&&validPages(source.pages)?clonePages(source.pages):clonePages(defaultMotivation);
 }
 
 async function requestPersistentStorage(){
@@ -1038,7 +1093,7 @@ document.getElementById("downloadBackup").addEventListener("click",()=>{
   syncEditorToPage();
   const payload={
     app:"Kerst Markt Motivatie",
-    version:"v1.1.2",
+    version:"v1.1.3",
     exportedAt:timestamp(),
     pages:clonePages(pages)
   };
