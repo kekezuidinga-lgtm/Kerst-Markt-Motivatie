@@ -94,35 +94,47 @@ body{
 }
 .house{
   position:absolute;bottom:0;width:15%;min-width:85px;height:48%;
-  background:linear-gradient(90deg,#263747,#344a58 55%,#1b2c3c);
+  background:linear-gradient(90deg,#243747 0%,#344b5a 58%,#1a2b3a 100%);
   border-radius:4px 4px 1px 1px;
-  box-shadow:0 10px 30px rgba(0,0,0,.25);
+  box-shadow:0 10px 30px rgba(0,0,0,.28);
 }
 .house:before{
-  content:"";position:absolute;left:-10%;top:-38%;width:120%;height:55%;
-  background:linear-gradient(180deg,#273e50,#172c41);
+  content:"";position:absolute;left:-12%;top:-34%;width:124%;height:48%;
+  background:linear-gradient(180deg,#314a5d 0%,#1b2e42 100%);
   clip-path:polygon(50% 0,100% 100%,0 100%);
+  filter:drop-shadow(0 3px 2px rgba(0,0,0,.2));
 }
 .house:after{
-  content:"";position:absolute;left:14%;top:47%;width:16%;height:24%;
-  background:#ffd980;box-shadow:58px 0 0 #ffd980,116px 0 0 #ffd980;
-  filter:drop-shadow(0 0 7px rgba(255,217,128,.5));
+  content:"";position:absolute;left:18%;top:42%;width:18%;height:23%;
+  background:#ffd980;
+  box-shadow:46px 0 0 #ffd980,92px 0 0 #ffd980;
+  border:2px solid rgba(31,48,60,.65);
+  filter:drop-shadow(0 0 7px rgba(255,217,128,.45));
 }
 .house:nth-child(1){left:3%;transform:scale(.72);transform-origin:bottom}
 .house:nth-child(2){left:23%;transform:scale(.95);transform-origin:bottom}
 .house:nth-child(3){left:45%;transform:scale(1.18);transform-origin:bottom}
 .house:nth-child(4){left:69%;transform:scale(.88);transform-origin:bottom}
 .house:nth-child(5){left:88%;transform:scale(.65);transform-origin:bottom}
+
 .lamp{
-  position:absolute;bottom:30%;width:3px;height:70px;background:#1d2c38;
-  box-shadow:0 0 0 1px rgba(0,0,0,.15);
+  position:absolute;bottom:21%;width:4px;height:115px;background:#182935;
+  border-radius:3px;
+  box-shadow:0 0 0 1px rgba(0,0,0,.15),0 0 10px rgba(0,0,0,.12);
+}
+.lamp:before{
+  content:"";position:absolute;left:50%;top:-3px;width:32px;height:4px;
+  transform:translateX(-50%);
+  border-radius:3px;background:#182935;
 }
 .lamp:after{
-  content:"";position:absolute;left:50%;top:-8px;transform:translateX(-50%);
-  width:15px;height:15px;border-radius:50%;background:#ffe29a;
-  box-shadow:0 0 18px 6px rgba(255,221,135,.3);
+  content:"";position:absolute;left:50%;top:-22px;transform:translateX(-50%);
+  width:18px;height:18px;border-radius:50%;
+  background:#ffe29a;
+  box-shadow:0 0 22px 8px rgba(255,221,135,.35);
 }
 .l1{left:14%}.l2{left:32%}.l3{left:63%}.l4{left:83%}
+
 .ground{
   position:absolute;inset:auto 0 0;height:22%;
   background:
