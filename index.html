@@ -93,29 +93,75 @@ body{
   transform:translateX(-50%);
 }
 .house{
-  position:absolute;bottom:0;width:15%;min-width:85px;height:48%;
-  background:linear-gradient(90deg,#243747 0%,#344b5a 58%,#1a2b3a 100%);
-  border-radius:4px 4px 1px 1px;
-  box-shadow:0 10px 30px rgba(0,0,0,.28);
-}
-.house:before{
-  content:"";position:absolute;left:-6%;top:-29%;width:112%;height:31%;
-  background:linear-gradient(180deg,#385267 0%,#1b3044 100%);
-  clip-path:polygon(50% 0,100% 100%,0 100%);
-  filter:drop-shadow(0 4px 3px rgba(0,0,0,.28));
+  position:absolute;bottom:0;width:16%;min-width:88px;height:52%;
+  background:
+    linear-gradient(90deg,rgba(255,255,255,.035),transparent 18% 82%,rgba(0,0,0,.16)),
+    linear-gradient(180deg,#3b4d59 0%,#2b3b48 62%,#202f3b 100%);
+  border-radius:3px 3px 0 0;
+  box-shadow:inset 0 0 18px rgba(0,0,0,.18),0 12px 28px rgba(0,0,0,.32);
+  overflow:visible;
 }
 .house:after{
-  content:"";position:absolute;left:17%;top:43%;width:17%;height:23%;
-  background:#ffd980;
-  box-shadow:58px 0 0 #ffd980;
-  border:2px solid rgba(31,48,60,.65);
-  filter:drop-shadow(0 0 7px rgba(255,217,128,.45));
+  content:"";position:absolute;left:0;right:0;bottom:0;height:8%;
+  background:linear-gradient(180deg,#1c2a34,#15222b);
+  border-radius:0 0 3px 3px;
 }
-.house:nth-child(1){left:3%;transform:scale(.72);transform-origin:bottom}
-.house:nth-child(2){left:23%;transform:scale(.95);transform-origin:bottom}
-.house:nth-child(3){left:45%;transform:scale(1.18);transform-origin:bottom}
-.house:nth-child(4){left:69%;transform:scale(.88);transform-origin:bottom}
-.house:nth-child(5){left:88%;transform:scale(.65);transform-origin:bottom}
+.roof{
+  position:absolute;left:-10%;top:-31%;width:120%;height:43%;
+  background:
+    linear-gradient(180deg,#3a5265 0%,#243a4c 58%,#172a3c 100%);
+  clip-path:polygon(50% 0,100% 100%,0 100%);
+  filter:drop-shadow(0 5px 4px rgba(0,0,0,.30));
+}
+.roof:before{
+  content:"";position:absolute;left:7%;top:17%;width:86%;height:18%;
+  background:linear-gradient(180deg,#f7fbfc,#dce9ed);
+  clip-path:polygon(50% 0,100% 100%,0 100%);
+  opacity:.96;
+}
+.roof:after{
+  content:"";position:absolute;left:0;right:0;bottom:0;height:10%;
+  background:rgba(9,22,34,.42);
+}
+.chimney{
+  position:absolute;right:17%;top:-34%;width:9%;height:37%;
+  min-width:8px;background:linear-gradient(90deg,#243643,#3b4c55,#1e2d36);
+  border-radius:2px 2px 0 0;
+  z-index:-1;
+}
+.chimney:after{
+  content:"";position:absolute;left:-14%;top:-4px;width:128%;height:5px;
+  border-radius:2px;background:#dce8ea;
+}
+.window{
+  position:absolute;top:37%;width:22%;height:23%;
+  background:
+    linear-gradient(90deg,transparent 45%,rgba(50,58,61,.85) 45% 55%,transparent 55%),
+    linear-gradient(180deg,transparent 45%,rgba(50,58,61,.85) 45% 55%,transparent 55%),
+    linear-gradient(180deg,#ffe8a5,#ffc95e 75%,#dba74b);
+  border:3px solid #172731;
+  border-radius:2px;
+  box-shadow:0 0 14px rgba(255,212,120,.36),inset 0 0 7px rgba(255,242,191,.35);
+}
+.w1{left:13%}.w2{right:13%}
+.door{
+  position:absolute;left:50%;bottom:5%;transform:translateX(-50%);
+  width:21%;height:35%;min-width:15px;
+  background:linear-gradient(90deg,#392c28,#594039 48%,#302521);
+  border:3px solid #182731;
+  border-radius:2px 2px 0 0;
+  box-shadow:inset 0 0 8px rgba(0,0,0,.22);
+}
+.door:after{
+  content:"";position:absolute;right:13%;top:51%;width:4px;height:4px;
+  border-radius:50%;background:#f0c86f;
+  box-shadow:0 0 5px rgba(240,200,111,.5);
+}
+.house:nth-child(1){left:2%;transform:scale(.68);transform-origin:bottom}
+.house:nth-child(2){left:22%;transform:scale(.93);transform-origin:bottom}
+.house:nth-child(3){left:43%;transform:scale(1.18);transform-origin:bottom}
+.house:nth-child(4){left:67%;transform:scale(.88);transform-origin:bottom}
+.house:nth-child(5){left:88%;transform:scale(.62);transform-origin:bottom}
 
 .lamp{
   position:absolute;bottom:21%;width:4px;height:115px;background:#182935;
@@ -194,7 +240,11 @@ body{
   <div class="forest"></div>
 
   <div class="village">
-    <div class="house"></div><div class="house"></div><div class="house"></div><div class="house"></div><div class="house"></div>
+    <div class="house"><div class="roof"></div><div class="chimney"></div><div class="window w1"></div><div class="window w2"></div><div class="door"></div></div>
+    <div class="house"><div class="roof"></div><div class="chimney"></div><div class="window w1"></div><div class="window w2"></div><div class="door"></div></div>
+    <div class="house"><div class="roof"></div><div class="chimney"></div><div class="window w1"></div><div class="window w2"></div><div class="door"></div></div>
+    <div class="house"><div class="roof"></div><div class="chimney"></div><div class="window w1"></div><div class="window w2"></div><div class="door"></div></div>
+    <div class="house"><div class="roof"></div><div class="chimney"></div><div class="window w1"></div><div class="window w2"></div><div class="door"></div></div>
     <div class="lamp l1"></div><div class="lamp l2"></div><div class="lamp l3"></div><div class="lamp l4"></div>
   </div>
 
