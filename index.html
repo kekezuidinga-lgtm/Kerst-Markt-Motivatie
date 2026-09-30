@@ -357,6 +357,187 @@ body{
   }
 }
 
+.editor-overlay{
+  position:fixed;
+  inset:0;
+  z-index:100;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:24px;
+  background:rgba(3,9,15,.72);
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
+}
+.editor-overlay.open{display:flex}
+.editor-panel{
+  width:min(980px,100%);
+  max-height:min(900px,calc(100vh - 48px));
+  overflow:auto;
+  border:1px solid rgba(255,255,255,.14);
+  border-radius:18px;
+  background:linear-gradient(180deg,#182935 0%,#0e1b25 100%);
+  color:#edf3f5;
+  box-shadow:0 30px 90px rgba(0,0,0,.55);
+}
+.editor-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:18px;
+  padding:20px 24px;
+  border-bottom:1px solid rgba(255,255,255,.09);
+}
+.editor-header h2{
+  margin:0;
+  font-size:20px;
+}
+.editor-hint{
+  color:#91a1a8;
+  font-size:12px;
+}
+.editor-body{padding:22px 24px 24px}
+.editor-toolbar{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:7px;
+  margin-bottom:14px;
+  padding:10px;
+  border:1px solid rgba(255,255,255,.09);
+  border-radius:11px;
+  background:rgba(7,16,24,.56);
+}
+.editor-toolbar button,
+.editor-toolbar select,
+.page-controls button,
+.editor-actions button{
+  min-height:34px;
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:7px;
+  padding:7px 10px;
+  color:#e8eef0;
+  background:#203340;
+  font:600 13px Arial,sans-serif;
+  cursor:pointer;
+}
+.editor-toolbar button:hover,
+.editor-toolbar select:hover,
+.page-controls button:hover,
+.editor-actions button:hover{
+  background:#294453;
+}
+.editor-toolbar button.active{
+  background:#38596b;
+  border-color:rgba(255,255,255,.24);
+}
+.editor-toolbar select{
+  padding-right:28px;
+}
+.editor-toolbar .separator{
+  width:1px;
+  height:25px;
+  margin:0 3px;
+  background:rgba(255,255,255,.12);
+}
+.editor-label{
+  display:block;
+  margin:0 0 7px;
+  color:#b7c4c9;
+  font-size:12px;
+  font-weight:700;
+  letter-spacing:.4px;
+  text-transform:uppercase;
+}
+.editor-editable{
+  min-height:54px;
+  width:100%;
+  outline:none;
+  border:1px solid rgba(255,255,255,.13);
+  border-radius:10px;
+  padding:15px 16px;
+  background:#101e28;
+  color:#f4f7f8;
+  line-height:1.55;
+  caret-color:#f0d58f;
+}
+.editor-editable:focus{
+  border-color:rgba(240,213,143,.45);
+  box-shadow:0 0 0 3px rgba(240,213,143,.07);
+}
+.editor-title-editor{
+  min-height:54px;
+  margin-bottom:16px;
+  font-size:25px;
+  font-weight:700;
+}
+.editor-message-editor{
+  min-height:220px;
+}
+.page-controls{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin-top:15px;
+}
+.page-count{
+  color:#aab8be;
+  font-size:13px;
+}
+.page-buttons{
+  display:flex;
+  gap:7px;
+}
+.editor-actions{
+  display:flex;
+  justify-content:flex-end;
+  gap:9px;
+  margin-top:20px;
+}
+.editor-actions .cancel{
+  background:#182832;
+}
+.editor-actions .save{
+  border-color:#8b753b;
+  background:linear-gradient(180deg,#b9944e,#80632d);
+  color:#fffaf0;
+}
+.editor-actions .save:hover{
+  background:linear-gradient(180deg,#c7a35c,#8b6d34);
+}
+.note-footer{
+  display:flex;
+  justify-content:flex-end;
+  margin-top:22px;
+  min-height:20px;
+}
+.next-page{
+  display:none;
+  border:0;
+  padding:0;
+  background:transparent;
+  color:#d7bb72;
+  font:700 13px Arial,sans-serif;
+  cursor:pointer;
+  letter-spacing:.2px;
+  text-decoration:none;
+}
+.next-page:hover{
+  color:#f0d995;
+  text-decoration:underline;
+}
+@media(max-width:700px){
+  .editor-overlay{padding:10px}
+  .editor-panel{max-height:calc(100vh - 20px);border-radius:13px}
+  .editor-header{padding:16px}
+  .editor-body{padding:16px}
+  .editor-hint{display:none}
+  .editor-toolbar{gap:5px}
+  .editor-toolbar button,.editor-toolbar select{min-height:32px;padding:6px 8px}
+  .editor-message-editor{min-height:180px}
+}
+
 .meta{
   position:absolute;
   top:22px;
@@ -399,7 +580,65 @@ body{
 </head>
 <body>
 <div class="scene">
-  <div class="meta"><div class="version">v1.1.0</div><div class="creator">Gemaakt door Keke Zuidinga</div></div>
+  <div class="meta"><div class="version">v1.1.1</div><div class="creator">Gemaakt door Keke Zuidinga</div></div>
+  <div class="editor-overlay" id="editorOverlay" aria-hidden="true">
+    <div class="editor-panel" role="dialog" aria-modal="true" aria-labelledby="editorHeading">
+      <div class="editor-header">
+        <h2 id="editorHeading">Motivatie bewerken</h2>
+        <span class="editor-hint">Ctrl + K om deze editor te openen • Esc om te sluiten</span>
+      </div>
+      <div class="editor-body">
+        <div class="editor-toolbar" id="editorToolbar">
+          <button type="button" data-cmd="bold" title="Vet"><strong>B</strong></button>
+          <button type="button" data-cmd="italic" title="Cursief"><em>I</em></button>
+          <button type="button" data-cmd="underline" title="Onderstrepen"><u>U</u></button>
+          <button type="button" data-cmd="strikeThrough" title="Doorhalen"><s>S</s></button>
+          <span class="separator"></span>
+          <select id="fontFamilyControl" title="Lettertype">
+            <option value="Arial">Arial</option>
+            <option value="Georgia">Georgia</option>
+            <option value="Verdana">Verdana</option>
+            <option value="Trebuchet MS">Trebuchet MS</option>
+            <option value="Courier New">Courier New</option>
+            <option value="Times New Roman">Times New Roman</option>
+          </select>
+          <select id="fontSizeControl" title="Tekstgrootte">
+            <option value="1">Klein</option>
+            <option value="3" selected>Normaal</option>
+            <option value="4">Groot</option>
+            <option value="5">Extra groot</option>
+            <option value="6">Heel groot</option>
+            <option value="7">Enorm</option>
+          </select>
+          <span class="separator"></span>
+          <button type="button" data-cmd="justifyLeft" title="Links uitlijnen">≡</button>
+          <button type="button" data-cmd="justifyCenter" title="Centreren">☰</button>
+          <button type="button" data-cmd="justifyRight" title="Rechts uitlijnen">≡</button>
+        </div>
+
+        <label class="editor-label">Titel</label>
+        <div class="editor-editable editor-title-editor" id="editorTitle" contenteditable="true" spellcheck="true"></div>
+
+        <label class="editor-label">Bericht</label>
+        <div class="editor-editable editor-message-editor" id="editorMessage" contenteditable="true" spellcheck="true"></div>
+
+        <div class="page-controls">
+          <span class="page-count" id="pageCount">Pagina 1 van 1</span>
+          <div class="page-buttons">
+            <button type="button" id="prevEditorPage">← Vorige</button>
+            <button type="button" id="addEditorPage">+ Pagina</button>
+            <button type="button" id="deleteEditorPage">Verwijder pagina</button>
+            <button type="button" id="nextEditorPage">Volgende →</button>
+          </div>
+        </div>
+
+        <div class="editor-actions">
+          <button type="button" class="cancel" id="cancelEditor">Annuleren</button>
+          <button type="button" class="save" id="saveEditor">Opslaan</button>
+        </div>
+      </div>
+    </div>
+  </div>
   <div class="christmas-lights">
     <span class="light"></span><span class="light"></span><span class="light"></span><span class="light"></span>
     <span class="light"></span><span class="light"></span><span class="light"></span><span class="light"></span>
@@ -408,6 +647,7 @@ body{
     <h1 id="noteTitle">Kerst Markt Motivatie</h1>
     <p id="noteText">Welkom dit is mijn kerst markt motiviatie. Ik ben Keke Zuidinga (443325) en hier leg ik uit wat mijn motivatie is om mee te gaan naar de kerst markt. Deze website heb ik helemaal zelf gecodeerd op GitHub alles wat je ziet heb ik gemaakt.</p>
     <button class="motivation-button" id="motivationButton" type="button">Laat mij jouw motivatie zien!</button>
+    <div class="note-footer"><button class="next-page" id="nextPageButton" type="button">Volgende pagina →</button></div>
   </div>
   <div class="sky-glow"></div>
   <div class="stars"></div>
@@ -438,12 +678,195 @@ body{
 const motivationButton=document.getElementById("motivationButton");
 const noteTitle=document.getElementById("noteTitle");
 const noteText=document.getElementById("noteText");
+const nextPageButton=document.getElementById("nextPageButton");
 
-motivationButton.addEventListener("click",()=>{
-  noteTitle.textContent="test1";
-  noteText.textContent="test2";
-  motivationButton.style.display="none";
+const editorOverlay=document.getElementById("editorOverlay");
+const editorTitle=document.getElementById("editorTitle");
+const editorMessage=document.getElementById("editorMessage");
+const pageCount=document.getElementById("pageCount");
+const editorToolbar=document.getElementById("editorToolbar");
+
+const defaultPages=[{
+  title:"Kerst Markt Motivatie",
+  message:"Welkom dit is mijn kerst markt motiviatie. Ik ben Keke Zuidinga (443325) en hier leg ik uit wat mijn motivatie is om mee te gaan naar de kerst markt. Deze website heb ik helemaal zelf gecodeerd op GitHub alles wat je ziet heb ik gemaakt."
+}];
+
+let pages=[];
+let currentPage=0;
+let savedSnapshot="";
+let activeEditor=editorMessage;
+
+function loadPages(){
+  try{
+    const stored=localStorage.getItem("kerstMarktMotivatiePages");
+    const parsed=stored?JSON.parse(stored):null;
+    pages=Array.isArray(parsed)&&parsed.length?parsed:structuredClone(defaultPages);
+  }catch{
+    pages=structuredClone(defaultPages);
+  }
+}
+
+function persistPages(){
+  localStorage.setItem("kerstMarktMotivatiePages",JSON.stringify(pages));
+}
+
+function renderPage(index=currentPage){
+  if(!pages[index]) index=0;
+  currentPage=index;
+  noteTitle.innerHTML=pages[currentPage].title||"";
+  noteText.innerHTML=pages[currentPage].message||"";
+
+  const hasNext=pages.length>currentPage+1;
+  nextPageButton.style.display=hasNext?"inline-block":"none";
+
+  if(motivationButton){
+    motivationButton.style.display=currentPage===0&&pages.length===1?"inline-block":"none";
+  }
+}
+
+function loadEditorPage(){
+  const page=pages[currentPage];
+  editorTitle.innerHTML=page.title||"";
+  editorMessage.innerHTML=page.message||"";
+  pageCount.textContent="Pagina "+(currentPage+1)+" van "+pages.length;
+  document.getElementById("prevEditorPage").disabled=currentPage===0;
+  document.getElementById("nextEditorPage").disabled=currentPage===pages.length-1;
+  document.getElementById("deleteEditorPage").disabled=pages.length===1;
+}
+
+function syncEditorToPage(){
+  if(!pages[currentPage]) return;
+  pages[currentPage].title=editorTitle.innerHTML;
+  pages[currentPage].message=editorMessage.innerHTML;
+}
+
+function openEditor(){
+  savedSnapshot=JSON.stringify(pages);
+  currentPage=Math.min(currentPage,pages.length-1);
+  loadEditorPage();
+  editorOverlay.classList.add("open");
+  editorOverlay.setAttribute("aria-hidden","false");
+  setTimeout(()=>editorTitle.focus(),30);
+}
+
+function closeEditor(){
+  editorOverlay.classList.remove("open");
+  editorOverlay.setAttribute("aria-hidden","true");
+}
+
+function execFormat(command,value=null){
+  activeEditor.focus();
+  try{
+    document.execCommand("styleWithCSS",false,true);
+    document.execCommand(command,false,value);
+    syncEditorToPage();
+  }catch{}
+}
+
+editorTitle.addEventListener("focus",()=>activeEditor=editorTitle);
+editorMessage.addEventListener("focus",()=>activeEditor=editorMessage);
+
+editorTitle.addEventListener("input",syncEditorToPage);
+editorMessage.addEventListener("input",syncEditorToPage);
+
+editorToolbar.addEventListener("mousedown",(event)=>{
+  const target=event.target.closest("button,select");
+  if(!target) return;
+  if(target.tagName==="BUTTON") event.preventDefault();
 });
+
+editorToolbar.addEventListener("click",(event)=>{
+  const button=event.target.closest("button[data-cmd]");
+  if(button) execFormat(button.dataset.cmd);
+});
+
+document.getElementById("fontFamilyControl").addEventListener("change",(event)=>{
+  execFormat("fontName",event.target.value);
+});
+
+document.getElementById("fontSizeControl").addEventListener("change",(event)=>{
+  execFormat("fontSize",event.target.value);
+});
+
+document.getElementById("addEditorPage").addEventListener("click",()=>{
+  syncEditorToPage();
+  pages.push({
+    title:"Nieuwe pagina",
+    message:"Schrijf hier je motivatie..."
+  });
+  currentPage=pages.length-1;
+  loadEditorPage();
+  editorTitle.focus();
+});
+
+document.getElementById("deleteEditorPage").addEventListener("click",()=>{
+  if(pages.length===1) return;
+  pages.splice(currentPage,1);
+  currentPage=Math.max(0,currentPage-1);
+  loadEditorPage();
+});
+
+document.getElementById("prevEditorPage").addEventListener("click",()=>{
+  syncEditorToPage();
+  if(currentPage>0){
+    currentPage--;
+    loadEditorPage();
+  }
+});
+
+document.getElementById("nextEditorPage").addEventListener("click",()=>{
+  syncEditorToPage();
+  if(currentPage<pages.length-1){
+    currentPage++;
+    loadEditorPage();
+  }
+});
+
+nextPageButton.addEventListener("click",()=>{
+  if(currentPage<pages.length-1) renderPage(currentPage+1);
+});
+
+document.getElementById("saveEditor").addEventListener("click",()=>{
+  syncEditorToPage();
+  persistPages();
+  renderPage(0);
+  closeEditor();
+});
+
+document.getElementById("cancelEditor").addEventListener("click",()=>{
+  pages=JSON.parse(savedSnapshot);
+  renderPage(0);
+  closeEditor();
+});
+
+editorOverlay.addEventListener("mousedown",(event)=>{
+  if(event.target===editorOverlay) closeEditor();
+});
+
+document.addEventListener("keydown",(event)=>{
+  if((event.ctrlKey||event.metaKey)&&event.key.toLowerCase()==="k"){
+    event.preventDefault();
+    openEditor();
+    return;
+  }
+  if(event.key==="Escape"&&editorOverlay.classList.contains("open")){
+    pages=JSON.parse(savedSnapshot);
+    renderPage(0);
+    closeEditor();
+  }
+});
+
+loadPages();
+renderPage(0);
+
+if(motivationButton){
+  motivationButton.addEventListener("click",()=>{
+    noteTitle.textContent="test1";
+    noteText.textContent="test2";
+    motivationButton.style.display="none";
+    nextPageButton.style.display="none";
+  });
+}
 </script>
 
 <script>
