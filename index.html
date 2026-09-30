@@ -231,6 +231,72 @@ body{
   animation:fall linear infinite;pointer-events:none;text-shadow:0 0 7px rgba(255,255,255,.35);
 }
 @keyframes fall{to{transform:translate3d(20px,115vh,0) rotate(260deg)}}
+.motivation-note{
+  position:absolute;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%);
+  width:min(680px,calc(100vw - 40px));
+  padding:32px 34px 30px;
+  z-index:15;
+  text-align:center;
+  color:#eef6fa;
+  background:linear-gradient(180deg,rgba(17,31,45,.86),rgba(11,23,35,.80));
+  border:1px solid rgba(255,255,255,.16);
+  border-radius:18px;
+  box-shadow:0 22px 60px rgba(0,0,0,.40),inset 0 1px 0 rgba(255,255,255,.08);
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+}
+.motivation-note h1{
+  margin:0 0 16px;
+  font-size:clamp(24px,3vw,38px);
+  line-height:1.1;
+  letter-spacing:.5px;
+  color:#fff9e7;
+  text-shadow:0 3px 18px rgba(0,0,0,.35);
+}
+.motivation-note p{
+  margin:0 auto 24px;
+  max-width:590px;
+  font-size:clamp(14px,1.5vw,18px);
+  line-height:1.7;
+  color:rgba(241,247,250,.92);
+}
+.motivation-button{
+  border:0;
+  border-radius:10px;
+  padding:13px 22px;
+  font:700 14px/1 Arial,sans-serif;
+  letter-spacing:.3px;
+  color:#1c2a33;
+  background:linear-gradient(180deg,#ffe9a8,#f6cb67);
+  box-shadow:0 8px 24px rgba(0,0,0,.24),0 0 18px rgba(255,220,130,.16);
+  cursor:pointer;
+  transition:transform .18s ease,box-shadow .18s ease,filter .18s ease;
+}
+.motivation-button:hover{
+  transform:translateY(-2px);
+  filter:brightness(1.04);
+  box-shadow:0 11px 28px rgba(0,0,0,.28),0 0 22px rgba(255,220,130,.22);
+}
+.motivation-button:active{
+  transform:translateY(0);
+}
+@media(max-width:700px){
+  .motivation-note{
+    width:calc(100vw - 24px);
+    padding:24px 20px 22px;
+    border-radius:15px;
+  }
+  .motivation-note p{
+    line-height:1.55;
+    font-size:14px;
+  }
+  .motivation-button{
+    width:100%;
+  }
+}
 .meta{
   position:absolute;
   top:22px;
@@ -273,7 +339,12 @@ body{
 </head>
 <body>
 <div class="scene">
-  <div class="meta"><div class="version">v1.0.5</div><div class="creator">Gemaakt door Keke Zuidinga</div></div>
+  <div class="meta"><div class="version">v1.0.6</div><div class="creator">Gemaakt door Keke Zuidinga</div></div>
+  <div class="motivation-note" id="motivationNote">
+    <h1 id="noteTitle">Kerst Markt Motivatie</h1>
+    <p id="noteText">Welkom dit is mijn kerst markt motiviatie. Ik ben Keke Zuidinga (443325) en hier leg ik uit wat mijn motivatie is om mee te gaan naar de kerst markt. Deze website heb ik helemaal zelf gecodeerd op GitHub alles wat je ziet heb ik gemaakt.</p>
+    <button class="motivation-button" id="motivationButton" type="button">Laat mij jouw motivatie zien!</button>
+  </div>
   <div class="sky-glow"></div>
   <div class="stars"></div>
   <div class="moon"></div>
@@ -298,6 +369,18 @@ body{
   <div class="ground"></div>
   <div class="title">Kerst Markt Motivatie</div>
 </div>
+
+<script>
+const motivationButton=document.getElementById("motivationButton");
+const noteTitle=document.getElementById("noteTitle");
+const noteText=document.getElementById("noteText");
+
+motivationButton.addEventListener("click",()=>{
+  noteTitle.textContent="test1";
+  noteText.textContent="test2";
+  motivationButton.style.display="none";
+});
+</script>
 
 <script>
 const scene=document.querySelector(".scene");
