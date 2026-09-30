@@ -605,7 +605,7 @@ body{
 </head>
 <body>
 <div class="scene">
-  <div class="meta"><div class="version">v1.1.4</div><div class="creator">Gemaakt door Keke Zuidinga</div></div>
+  <div class="meta"><div class="version">v1.1.5</div><div class="creator">Gemaakt door Keke Zuidinga</div></div>
   <div class="editor-overlay" id="editorOverlay" aria-hidden="true">
     <div class="editor-panel" role="dialog" aria-modal="true" aria-labelledby="editorHeading">
       <div class="editor-header">
@@ -940,9 +940,18 @@ async function loadSavedData(){
   const source=candidates[0];
   pages=source?clonePages(source.pages):clonePages(defaultMotivation);
 
-  // Migrate older saved motivations into the new redundant storage system.
-  if(legacy&&source===legacy){
-    await saveNow("Oude motivatie gemigreerd");
+  // The welcome card is fixed and must never become an editable motivation page.
+  // Older versions accidentally stored the welcome card as page 1.
+  const welcomeTitle="Kerst Markt Motivatie";
+  const welcomeStart="Welkom dit is mijn kerst markt motiviatie.";
+  if(
+    pages[0] &&
+    pages[0].title.trim()===welcomeTitle &&
+    pages[0].message.trim().startsWith(welcomeStart)
+  ){
+    pages[0]=clonePages(defaultMotivation)[0];
+    persistPages();
+    await saveNow("Welkomstpagina losgekoppeld van motivatie");
   }
 }
 
@@ -1095,7 +1104,7 @@ document.getElementById("downloadBackup").addEventListener("click",()=>{
   syncEditorToPage();
   const payload={
     app:"Kerst Markt Motivatie",
-    version:"v1.1.4",
+    version:"v1.1.5",
     exportedAt:timestamp(),
     pages:clonePages(pages)
   };
