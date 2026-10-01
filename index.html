@@ -812,7 +812,7 @@ body{
 </head>
 <body>
 <div class="scene">
-  <div class="meta"><div class="version">v1.1.10</div><div class="creator">Gemaakt door Keke Zuidinga</div></div>
+  <div class="meta"><div class="version">v1.1.11</div><div class="creator">Gemaakt door Keke Zuidinga</div></div>
   <div class="editor-overlay" id="editorOverlay" aria-hidden="true">
     <div class="editor-panel" role="dialog" aria-modal="true" aria-labelledby="editorHeading">
       <div class="editor-header">
@@ -1338,7 +1338,7 @@ document.getElementById("downloadBackup").addEventListener("click",()=>{
   syncEditorToPage();
   const payload={
     app:"Kerst Markt Motivatie",
-    version:"v1.1.10",
+    version:"v1.1.11",
     exportedAt:timestamp(),
     pages:clonePages(pages)
   };
@@ -1432,45 +1432,72 @@ function easeInOutCubic(t){
   return t<0.5 ? 4*t*t*t : 1-Math.pow(-2*t+2,3)/2;
 }
 
-function zoomToCharacter(){
+function animateCamera(targetScale, targetX, targetY, duration, onDone){
   const camera=document.getElementById("cinematicCamera");
-  if(!camera||!character) return;
+  if(!camera) return;
 
-  const duration=2600;
-  const scale=2.55;
   const startTime=performance.now();
-
-  const charRect=character.getBoundingClientRect();
-  const targetX=charRect.left+charRect.width/2;
-  const targetY=charRect.top+charRect.height/2;
-  const viewportX=window.innerWidth/2;
-  const viewportY=window.innerHeight/2;
-
-  const endX=viewportX-targetX*scale;
-  const endY=viewportY-targetY*scale;
+  const startScale=window.__cameraScale||1;
+  const startX=window.__cameraX||0;
+  const startY=window.__cameraY||0;
 
   function frame(now){
     const progress=Math.min(1,(now-startTime)/duration);
     const eased=easeInOutCubic(progress);
-    const currentScale=1+(scale-1)*eased;
-    const currentX=endX*eased;
-    const currentY=endY*eased;
+    const scale=startScale+(targetScale-startScale)*eased;
+    const x=startX+(targetX-startX)*eased;
+    const y=startY+(targetY-startY)*eased;
 
-    camera.style.transform="translate3d("+currentX+"px,"+currentY+"px,0) scale("+currentScale+")";
+    window.__cameraScale=scale;
+    window.__cameraX=x;
+    window.__cameraY=y;
+    camera.style.transform="translate3d("+x+"px,"+y+"px,0) scale("+scale+")";
 
     if(progress<1){
       requestAnimationFrame(frame);
+    }else if(onDone){
+      onDone();
     }
   }
 
   requestAnimationFrame(frame);
 }
 
+function zoomToCharacter(){
+  const camera=document.getElementById("cinematicCamera");
+  if(!camera||!character) return;
+
+  const duration=2800;
+  // Less enlargement keeps the snow/village edges out of frame.
+  const scale=1.85;
+
+  const charRect=character.getBoundingClientRect();
+  const targetX=charRect.left+charRect.width/2;
+  const targetY=charRect.top+charRect.height/2;
+
+  // Place Keke slightly below center so his speech bubble has room above him.
+  const desiredX=window.innerWidth/2;
+  const desiredY=window.innerHeight*0.64;
+
+  const endX=desiredX-targetX*scale;
+  const endY=desiredY-targetY*scale;
+
+  animateCamera(scale,endX,endY,duration);
+}
+
+function zoomOutFromCharacter(){
+  animateCamera(1,0,0,2200,()=>{
+    scene.classList.remove("conversation");
+    scene.classList.remove("cinematic");
+    bubbleText.textContent="";
+    characterActivated=false;
+  });
+}
+
 function startCharacterConversation(){
   if(characterActivated) return;
   characterActivated=true;
 
-  // The message fades independently while the camera starts its slow-fast-slow zoom.
   scene.classList.add("cinematic");
   zoomToCharacter();
 
@@ -1478,14 +1505,20 @@ function startCharacterConversation(){
     scene.classList.add("conversation");
     const message="Hey! Ik ben Keke";
     let index=0;
+
     const typeNext=()=>{
-      if(index>=message.length) return;
+      if(index>=message.length){
+        setTimeout(zoomOutFromCharacter,4000);
+        return;
+      }
+
       bubbleText.textContent+=message[index];
       index++;
       setTimeout(typeNext,message[index-1]===" "?90:62);
     };
+
     typeNext();
-  },3600);
+  },2800);
 }
 
 character.addEventListener("click",startCharacterConversation);
