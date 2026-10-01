@@ -564,18 +564,20 @@ body{
 .editor-backup-row button:hover{background:#213744}
 
 
-.cinematic-world{
+/* Keke cinematic interaction */
+.cinematic-camera{
   position:absolute;
   inset:0;
-  transform-origin:84% 76%;
-  transition:transform 1.8s cubic-bezier(.18,.72,.27,1);
+  transform-origin:84% 78%;
+  transition:transform 2.15s cubic-bezier(.22,.72,.26,1);
+  will-change:transform;
 }
-.scene.cinematic .cinematic-world{
-  transform:scale(2.35);
+.scene.cinematic .cinematic-camera{
+  transform:scale(2.15);
 }
 .scene.cinematic .motivation-note{
   opacity:0;
-  transform:translate(-50%,-50%) scale(.97);
+  transform:translate(-50%,-50%) translateY(10px) scale(.98);
   pointer-events:none;
   transition:opacity .55s ease,transform .7s ease;
 }
@@ -586,23 +588,23 @@ body{
 }
 .character{
   position:absolute;
-  right:14%;
-  bottom:17%;
+  right:13%;
+  bottom:9%;
   width:58px;
   height:112px;
   z-index:30;
   cursor:pointer;
   user-select:none;
   outline:none;
-  filter:drop-shadow(0 8px 10px rgba(0,0,0,.32));
+  filter:drop-shadow(0 8px 11px rgba(0,0,0,.35));
   transition:transform .18s ease,filter .18s ease;
 }
 .character:hover{
-  transform:translateY(-3px) scale(1.04);
-  filter:drop-shadow(0 11px 14px rgba(0,0,0,.38));
+  transform:translateY(-4px) scale(1.04);
+  filter:drop-shadow(0 11px 15px rgba(0,0,0,.42));
 }
 .character:focus-visible{
-  outline:2px solid rgba(255,227,155,.9);
+  outline:2px solid rgba(255,225,155,.9);
   outline-offset:5px;
   border-radius:10px;
 }
@@ -614,7 +616,7 @@ body{
   height:11px;
   transform:translateX(-50%);
   border-radius:50%;
-  background:rgba(0,0,0,.26);
+  background:rgba(0,0,0,.28);
   filter:blur(4px);
 }
 .character .body{
@@ -726,8 +728,8 @@ body{
 .character .leg.right{left:33px}
 .character-bubble{
   position:absolute;
-  right:calc(14% - 210px);
-  bottom:39%;
+  right:calc(13% - 210px);
+  bottom:34%;
   width:255px;
   min-height:54px;
   padding:14px 16px;
@@ -767,13 +769,9 @@ body{
   to{opacity:1;transform:translateY(0) scale(1)}
 }
 @media(max-width:700px){
-  .scene.cinematic .cinematic-world{transform:scale(2.15)}
-  .character{right:11%;bottom:16%;transform:scale(.9)}
-  .character-bubble{
-    right:7%;
-    bottom:40%;
-    width:225px;
-  }
+  .scene.cinematic .cinematic-camera{transform:scale(2.0)}
+  .character{right:10%;bottom:8%;transform:scale(.9)}
+  .character-bubble{right:6%;bottom:38%;width:225px}
 }
 
 .meta{
@@ -818,7 +816,7 @@ body{
 </head>
 <body>
 <div class="scene">
-  <div class="meta"><div class="version">v1.1.7</div><div class="creator">Gemaakt door Keke Zuidinga</div></div>
+  <div class="meta"><div class="version">v1.1.8</div><div class="creator">Gemaakt door Keke Zuidinga</div></div>
   <div class="editor-overlay" id="editorOverlay" aria-hidden="true">
     <div class="editor-panel" role="dialog" aria-modal="true" aria-labelledby="editorHeading">
       <div class="editor-header">
@@ -886,7 +884,6 @@ body{
     </div>
   </div>
   <div class="christmas-lights">
-  <div class="cinematic-world" id="cinematicWorld">
     <span class="light"></span><span class="light"></span><span class="light"></span><span class="light"></span>
     <span class="light"></span><span class="light"></span><span class="light"></span><span class="light"></span>
   </div>
@@ -896,6 +893,7 @@ body{
     <button class="motivation-button" id="motivationButton" type="button">Laat mij jouw motivatie zien!</button>
     <div class="note-footer"><button class="next-page" id="nextPageButton" type="button">Volgende pagina →</button></div>
   </div>
+  <div class="cinematic-camera" id="cinematicCamera">
   <div class="sky-glow"></div>
   <div class="stars"></div>
   <div class="moon"></div>
@@ -918,25 +916,23 @@ body{
   <div class="tree t4"><div class="trunk"></div><div class="snow"></div></div>
 
   <div class="ground"></div>
-  <div class="title">Kerst Markt Motivatie</div>
-
-    <div class="character" id="character" role="button" tabindex="0" aria-label="Praat met Keke">
-      <div class="shadow"></div>
-      <div class="body"></div>
-      <div class="scarf"></div>
-      <div class="scarf-tail"></div>
-      <div class="head"></div>
-      <div class="hat"></div>
-      <div class="eye left"></div><div class="eye right"></div>
-      <div class="nose"></div>
-      <div class="arm left"></div><div class="arm right"></div>
-      <div class="leg left"></div><div class="leg right"></div>
-    </div>
-    <div class="character-bubble" id="characterBubble">
-      <div class="bubble-text" id="bubbleText"></div>
-    </div>
+  <div class="character" id="character" role="button" tabindex="0" aria-label="Praat met Keke">
+    <div class="shadow"></div>
+    <div class="body"></div>
+    <div class="scarf"></div>
+    <div class="scarf-tail"></div>
+    <div class="head"></div>
+    <div class="hat"></div>
+    <div class="eye left"></div><div class="eye right"></div>
+    <div class="nose"></div>
+    <div class="arm left"></div><div class="arm right"></div>
+    <div class="leg left"></div><div class="leg right"></div>
   </div>
-</div>
+  <div class="character-bubble" id="characterBubble">
+    <div class="bubble-text" id="bubbleText"></div>
+  </div>
+  <div class="title">Kerst Markt Motivatie</div>
+</div>  </div>
 
 <script>
 const motivationButton=document.getElementById("motivationButton");
@@ -1346,7 +1342,7 @@ document.getElementById("downloadBackup").addEventListener("click",()=>{
   syncEditorToPage();
   const payload={
     app:"Kerst Markt Motivatie",
-    version:"v1.1.6",
+    version:"v1.1.8",
     exportedAt:timestamp(),
     pages:clonePages(pages)
   };
@@ -1431,8 +1427,6 @@ motivationButton.addEventListener("click",async()=>{
 </script>
 
 <script>
-const scene=document.querySelector(".scene");
-
 const character=document.getElementById("character");
 const characterBubble=document.getElementById("characterBubble");
 const bubbleText=document.getElementById("bubbleText");
@@ -1464,8 +1458,10 @@ character.addEventListener("keydown",event=>{
     startCharacterConversation();
   }
 });
+</script>
 
-
+<script>
+const scene=document.querySelector(".scene");
 const symbols=["❄","•","✦"];
 for(let i=0;i<100;i++){
   const s=document.createElement("div");
