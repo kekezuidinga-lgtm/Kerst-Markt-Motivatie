@@ -198,21 +198,19 @@ body{
 .l1{left:14%}.l2{left:32%}.l3{left:63%}.l4{left:83%}
 
 .ground{
-  position:absolute;inset:auto 0 0;height:22%;
-  background:
-    radial-gradient(ellipse at 50% -12%,rgba(255,255,255,.98),rgba(235,246,249,.98) 47%,#d6e8ed 100%);
-  clip-path:polygon(0 18%,7% 14%,15% 19%,24% 11%,34% 18%,44% 10%,55% 17%,67% 8%,77% 16%,88% 10%,100% 17%,100% 100%,0 100%);
-  z-index:10;
-}
-.snow-depth{
   position:absolute;
-  left:-50%;
-  right:-50%;
+  left:0;
+  right:0;
   top:78%;
-  height:160%;
-  background:linear-gradient(180deg,#e4f0f3 0%,#d8e9ee 42%,#c9dde4 100%);
-  z-index:9;
-  pointer-events:none;
+  height:170%;
+  background:
+    radial-gradient(ellipse at 50% 1%,rgba(255,255,255,.98),rgba(235,246,249,.98) 7%,#d6e8ed 14%,#d6e8ed 100%);
+  clip-path:polygon(
+    0 2.12%,7% 1.81%,15% 2.47%,24% 1.42%,34% 2.12%,44% 1.29%,
+    55% 2.20%,67% 1.04%,77% 2.07%,88% 1.29%,100% 2.20%,
+    100% 100%,0 100%
+  );
+  z-index:10;
 }
 .tree{
   position:absolute;bottom:12%;width:0;height:0;
@@ -816,14 +814,14 @@ body{
 @media(max-width:700px){
   .title{letter-spacing:4px}
   .village{width:110vw}
-  .ground{height:22%}
+  .ground{top:78%;height:170%}
   .tree{bottom:14%}
 }
 </style>
 </head>
 <body>
 <div class="scene">
-  <div class="meta"><div class="version">v1.1.15</div><div class="creator">Gemaakt door Keke Zuidinga</div></div>
+  <div class="meta"><div class="version">v1.1.16</div><div class="creator">Gemaakt door Keke Zuidinga</div></div>
   <div class="editor-overlay" id="editorOverlay" aria-hidden="true">
     <div class="editor-panel" role="dialog" aria-modal="true" aria-labelledby="editorHeading">
       <div class="editor-header">
@@ -1350,7 +1348,7 @@ document.getElementById("downloadBackup").addEventListener("click",()=>{
   syncEditorToPage();
   const payload={
     app:"Kerst Markt Motivatie",
-    version:"v1.1.15",
+    version:"v1.1.16",
     exportedAt:timestamp(),
     pages:clonePages(pages)
   };
