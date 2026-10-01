@@ -216,38 +216,30 @@ body{
   z-index:10;
   pointer-events:none;
 }
-.snow-hills{
+.snow-ridge{
   position:absolute;
-  left:-2vw;
-  top:77.5%;
+  left:-1vw;
+  top:75%;
   width:102vw;
-  height:12%;
+  height:18%;
   z-index:11;
   pointer-events:none;
-  overflow:visible;
 }
-.snow-hills-clone{
+.snow-ridge-clone{
   position:absolute;
-  left:95.5vw;
-  top:77.5%;
+  left:96vw;
+  top:75%;
   width:102vw;
-  height:12%;
+  height:18%;
   z-index:11;
   pointer-events:none;
-  overflow:visible;
 }
-.snow-hill{
-  position:absolute;
-  bottom:0;
+.snow-ridge svg{
+  display:block;
+  width:100%;
   height:100%;
-  border-radius:50% 50% 0 0 / 100% 100% 0 0;
-  background:linear-gradient(180deg,#f9fcfd 0%,#e8f2f5 42%,#dcebef 100%);
+  overflow:visible;
 }
-.snow-hill.h1{left:-2%;width:23%;height:83%}
-.snow-hill.h2{left:16%;width:25%;height:100%}
-.snow-hill.h3{left:38%;width:23%;height:78%}
-.snow-hill.h4{left:57%;width:26%;height:94%}
-.snow-hill.h5{left:80%;width:22%;height:81%}
 .tree{
   position:absolute;bottom:12%;width:0;height:0;
   border-left:clamp(42px,5vw,75px) solid transparent;
@@ -615,14 +607,17 @@ body{
   inset:0;
   transform-origin:0 0;
   transform:translate3d(0,0,0) scale(1);
+  transform-style:preserve-3d;
+  backface-visibility:hidden;
+  -webkit-backface-visibility:hidden;
   will-change:transform;
 }
-.scene.fade-return .cinematic-camera,
 .scene.fade-return .motivation-note,
 .scene.fade-return .meta,
-.scene.fade-return .title{
+.scene.fade-return .title,
+.scene.fade-return .character{
   opacity:0;
-  transition:opacity .55s ease;
+  transition:opacity .65s ease;
 }
 .scene.cinematic .motivation-note{
   opacity:0;
@@ -858,16 +853,16 @@ body{
   .title{letter-spacing:4px}
   .village{width:110vw}
   .ground{top:80%;height:170%}
-  .ground-clone{left:97.5vw;top:80%;height:170%}
-  .snow-hills{left:-4vw;top:77.5%;width:108vw}
-  .snow-hills-clone{left:94vw;top:77.5%;width:108vw}
+  .ground-clone{left:94vw;top:80%;height:170%}
+  .snow-ridge{left:-4vw;top:75%;width:108vw;height:18%}
+  .snow-ridge-clone{left:92vw;top:75%;width:108vw;height:18%}
   .tree{bottom:14%}
 }
 </style>
 </head>
 <body>
 <div class="scene">
-  <div class="meta"><div class="version">v1.1.21</div><div class="creator">Gemaakt door Keke Zuidinga</div></div>
+  <div class="meta"><div class="version">v1.1.22</div><div class="creator">Gemaakt door Keke Zuidinga</div></div>
   <div class="editor-overlay" id="editorOverlay" aria-hidden="true">
     <div class="editor-panel" role="dialog" aria-modal="true" aria-labelledby="editorHeading">
       <div class="editor-header">
@@ -968,15 +963,30 @@ body{
 
   <div class="ground"></div>
   <div class="ground-clone"></div>
-  <div class="snow-hills">
-    <div class="snow-hill h1"></div><div class="snow-hill h2"></div>
-    <div class="snow-hill h3"></div><div class="snow-hill h4"></div><div class="snow-hill h5"></div>
+  <div class="snow-ridge" aria-hidden="true">
+    <svg viewBox="0 0 1200 180" preserveAspectRatio="none">
+      <defs>
+        <linearGradient id="snowFill" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#fbfdfe"/>
+          <stop offset="55%" stop-color="#e9f3f6"/>
+          <stop offset="100%" stop-color="#dcebef"/>
+        </linearGradient>
+      </defs>
+      <path fill="url(#snowFill)" d="M0 112 C55 76 130 88 198 104 C265 120 323 82 390 91 C464 102 512 55 589 70 C665 87 716 58 783 76 C856 96 924 62 990 79 C1062 98 1128 58 1200 83 L1200 180 L0 180 Z"/>
+    </svg>
   </div>
-  <div class="snow-hills-clone">
-    <div class="snow-hill h1"></div><div class="snow-hill h2"></div>
-    <div class="snow-hill h3"></div><div class="snow-hill h4"></div><div class="snow-hill h5"></div>
+  <div class="snow-ridge-clone" aria-hidden="true">
+    <svg viewBox="0 0 1200 180" preserveAspectRatio="none">
+      <defs>
+        <linearGradient id="snowFillClone" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#fbfdfe"/>
+          <stop offset="55%" stop-color="#e9f3f6"/>
+          <stop offset="100%" stop-color="#dcebef"/>
+        </linearGradient>
+      </defs>
+      <path fill="url(#snowFillClone)" d="M0 112 C55 76 130 88 198 104 C265 120 323 82 390 91 C464 102 512 55 589 70 C665 87 716 58 783 76 C856 96 924 62 990 79 C1062 98 1128 58 1200 83 L1200 180 L0 180 Z"/>
+    </svg>
   </div>
-  <div class="snow-depth"></div>
   <div class="character" id="character" role="button" tabindex="0" aria-label="Praat met Keke">
     <div class="shadow"></div>
     <div class="body"></div>
@@ -1403,7 +1413,7 @@ document.getElementById("downloadBackup").addEventListener("click",()=>{
   syncEditorToPage();
   const payload={
     app:"Kerst Markt Motivatie",
-    version:"v1.1.21",
+    version:"v1.1.22",
     exportedAt:timestamp(),
     pages:clonePages(pages)
   };
@@ -1552,23 +1562,18 @@ function zoomToCharacter(){
 
 function zoomOutFromCharacter(){
   animateCamera(1,0,0,2200,()=>{
-    // The camera reaches its original position first. Then the normal scene
-    // fades back in instead of snapping on-screen.
     scene.classList.add("fade-return");
 
-    setTimeout(()=>{
-      scene.classList.remove("conversation");
-      scene.classList.remove("cinematic");
-      bubbleText.textContent="";
-      characterActivated=false;
+    scene.classList.remove("conversation");
+    scene.classList.remove("cinematic");
+    bubbleText.textContent="";
+    characterActivated=false;
 
-      // Give the browser one frame with the normal layout hidden, then fade it in.
+    requestAnimationFrame(()=>{
       requestAnimationFrame(()=>{
-        requestAnimationFrame(()=>{
-          scene.classList.remove("fade-return");
-        });
+        scene.classList.remove("fade-return");
       });
-    },220);
+    });
   });
 }
 
