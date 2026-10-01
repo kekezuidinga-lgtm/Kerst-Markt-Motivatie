@@ -816,6 +816,11 @@ body{
 .scene.conversation .character-bubble{
   animation:bubbleIn .38s cubic-bezier(.18,.9,.25,1) forwards;
 }
+.scene.hint-active .character-bubble{
+  opacity:1;
+  transform:translateY(0) scale(1);
+  animation:none;
+}
 .scene.conversation .character{
   pointer-events:none;
 }
@@ -995,7 +1000,7 @@ body{
 </head>
 <body>
 <div class="scene">
-  <div class="meta"><div class="version">v1.1.28</div><div class="creator">Gemaakt door Keke Zuidinga</div></div>
+  <div class="meta"><div class="version">v1.1.29</div><div class="creator">Gemaakt door Keke Zuidinga</div></div>
   <div class="editor-overlay" id="editorOverlay" aria-hidden="true">
     <div class="editor-panel" role="dialog" aria-modal="true" aria-labelledby="editorHeading">
       <div class="editor-header">
@@ -1655,6 +1660,9 @@ const VOTE_KEY="kerstMarktMotivatie_votes_v1";
 let votes=Array(10).fill(0);
 let characterActivated=false;
 let interactionFinished=false;
+let hintStopped=false;
+let hintTimer=null;
+let hintVisible=false;
 
 function loadVotes(){
   try{
@@ -1835,8 +1843,36 @@ function zoomOutFromCharacter(){
   });
 }
 
+function stopCharacterHint(){
+  hintStopped=true;
+  if(hintTimer){
+    clearTimeout(hintTimer);
+    hintTimer=null;
+  }
+  hintVisible=false;
+  scene.classList.remove("hint-active");
+  bubbleText.textContent="";
+  try{localStorage.setItem("kerstMarktMotivatie_kekeHintDone_v1","1");}catch{}
+}
+
+function runCharacterHint(){
+  if(hintStopped||characterActivated) return;
+  hintVisible=!hintVisible;
+
+  if(hintVisible){
+    bubbleText.textContent="Klik mij!";
+    scene.classList.add("hint-active");
+  }else{
+    scene.classList.remove("hint-active");
+    bubbleText.textContent="";
+  }
+
+  hintTimer=setTimeout(runCharacterHint,5000);
+}
+
 function startCharacterConversation(){
   if(characterActivated) return;
+  stopCharacterHint();
   characterActivated=true;
   interactionFinished=false;
 
@@ -1883,6 +1919,10 @@ document.addEventListener("keydown",event=>{
 
 loadVotes();
 renderVoteStats();
+try{hintStopped=localStorage.getItem("kerstMarktMotivatie_kekeHintDone_v1")==="1";}catch{hintStopped=false;}
+if(!hintStopped){
+  hintTimer=setTimeout(runCharacterHint,5000);
+}
 </script>
 
 <script>
