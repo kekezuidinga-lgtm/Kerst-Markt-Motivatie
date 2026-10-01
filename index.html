@@ -219,7 +219,7 @@ body{
 .snow-hills{
   position:absolute;
   left:-2vw;
-  top:76%;
+  top:77.5%;
   width:102vw;
   height:12%;
   z-index:11;
@@ -229,7 +229,7 @@ body{
 .snow-hills-clone{
   position:absolute;
   left:95.5vw;
-  top:76%;
+  top:77.5%;
   width:102vw;
   height:12%;
   z-index:11;
@@ -617,6 +617,13 @@ body{
   transform:translate3d(0,0,0) scale(1);
   will-change:transform;
 }
+.scene.fade-return .cinematic-camera,
+.scene.fade-return .motivation-note,
+.scene.fade-return .meta,
+.scene.fade-return .title{
+  opacity:0;
+  transition:opacity .55s ease;
+}
 .scene.cinematic .motivation-note{
   opacity:0;
   transform:translate(-50%,-50%) translateY(10px) scale(.98);
@@ -852,15 +859,15 @@ body{
   .village{width:110vw}
   .ground{top:80%;height:170%}
   .ground-clone{left:97.5vw;top:80%;height:170%}
-  .snow-hills{left:-4vw;top:76%;width:108vw}
-  .snow-hills-clone{left:94vw;top:76%;width:108vw}
+  .snow-hills{left:-4vw;top:77.5%;width:108vw}
+  .snow-hills-clone{left:94vw;top:77.5%;width:108vw}
   .tree{bottom:14%}
 }
 </style>
 </head>
 <body>
 <div class="scene">
-  <div class="meta"><div class="version">v1.1.20</div><div class="creator">Gemaakt door Keke Zuidinga</div></div>
+  <div class="meta"><div class="version">v1.1.21</div><div class="creator">Gemaakt door Keke Zuidinga</div></div>
   <div class="editor-overlay" id="editorOverlay" aria-hidden="true">
     <div class="editor-panel" role="dialog" aria-modal="true" aria-labelledby="editorHeading">
       <div class="editor-header">
@@ -1396,7 +1403,7 @@ document.getElementById("downloadBackup").addEventListener("click",()=>{
   syncEditorToPage();
   const payload={
     app:"Kerst Markt Motivatie",
-    version:"v1.1.20",
+    version:"v1.1.21",
     exportedAt:timestamp(),
     pages:clonePages(pages)
   };
@@ -1545,10 +1552,23 @@ function zoomToCharacter(){
 
 function zoomOutFromCharacter(){
   animateCamera(1,0,0,2200,()=>{
-    scene.classList.remove("conversation");
-    scene.classList.remove("cinematic");
-    bubbleText.textContent="";
-    characterActivated=false;
+    // The camera reaches its original position first. Then the normal scene
+    // fades back in instead of snapping on-screen.
+    scene.classList.add("fade-return");
+
+    setTimeout(()=>{
+      scene.classList.remove("conversation");
+      scene.classList.remove("cinematic");
+      bubbleText.textContent="";
+      characterActivated=false;
+
+      // Give the browser one frame with the normal layout hidden, then fade it in.
+      requestAnimationFrame(()=>{
+        requestAnimationFrame(()=>{
+          scene.classList.remove("fade-return");
+        });
+      });
+    },220);
   });
 }
 
