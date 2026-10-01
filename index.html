@@ -783,7 +783,7 @@ body{
 .character-bubble{
   position:absolute;
   right:calc(13% - 210px);
-  bottom:34%;
+  bottom:28%;
   width:255px;
   min-height:54px;
   padding:14px 16px;
@@ -816,10 +816,16 @@ body{
 .scene.conversation .character-bubble{
   animation:bubbleIn .38s cubic-bezier(.18,.9,.25,1) forwards;
 }
+.scene.bubble-pop-out .character-bubble{
+  animation:bubbleOut .28s ease forwards;
+}
+@keyframes bubbleOut{
+  to{opacity:0;transform:translateY(8px) scale(.92)}
+}
 .scene.hint-active .character-bubble{
   opacity:1;
   transform:translateY(0) scale(1);
-  animation:none;
+  animation:bubbleIn .38s cubic-bezier(.18,.9,.25,1) forwards;
 }
 .scene.conversation .character{
   pointer-events:none;
@@ -1000,7 +1006,7 @@ body{
 </head>
 <body>
 <div class="scene">
-  <div class="meta"><div class="version">v1.1.29</div><div class="creator">Gemaakt door Keke Zuidinga</div></div>
+  <div class="meta"><div class="version">v1.1.30</div><div class="creator">Gemaakt door Keke Zuidinga</div></div>
   <div class="editor-overlay" id="editorOverlay" aria-hidden="true">
     <div class="editor-panel" role="dialog" aria-modal="true" aria-labelledby="editorHeading">
       <div class="editor-header">
@@ -1851,6 +1857,7 @@ function stopCharacterHint(){
   }
   hintVisible=false;
   scene.classList.remove("hint-active");
+  scene.classList.remove("bubble-pop-out");
   bubbleText.textContent="";
   try{localStorage.setItem("kerstMarktMotivatie_kekeHintDone_v1","1");}catch{}
 }
@@ -1860,11 +1867,16 @@ function runCharacterHint(){
   hintVisible=!hintVisible;
 
   if(hintVisible){
+    scene.classList.remove("bubble-pop-out");
     bubbleText.textContent="Klik mij!";
     scene.classList.add("hint-active");
   }else{
     scene.classList.remove("hint-active");
-    bubbleText.textContent="";
+    scene.classList.add("bubble-pop-out");
+    setTimeout(()=>{
+      if(!hintVisible) bubbleText.textContent="";
+      scene.classList.remove("bubble-pop-out");
+    },280);
   }
 
   hintTimer=setTimeout(runCharacterHint,5000);
@@ -1884,9 +1896,14 @@ function startCharacterConversation(){
   setTimeout(()=>{
     scene.classList.add("conversation");
 
+    scene.classList.remove("bubble-pop-out");
     typeBubble("Yo! Ik ben Keke",()=>{
       setTimeout(()=>{
-        typeBubble("Wat vind je van deze app?",showVoteOptions);
+        scene.classList.add("bubble-pop-out");
+        setTimeout(()=>{
+          scene.classList.remove("bubble-pop-out");
+          typeBubble("Wat vind je van deze app?",showVoteOptions);
+        },280);
       },2000);
     });
   },2800);
