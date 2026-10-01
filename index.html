@@ -212,13 +212,12 @@ body{
   );
   z-index:10;
 }
-.ground:after{
-  content:"";
+.ground-clone{
   position:absolute;
-  left:98vw;
-  top:0;
+  left:97.5vw;
+  top:78%;
   width:100vw;
-  height:100%;
+  height:170%;
   background:
     radial-gradient(ellipse at 50% 1%,rgba(255,255,255,.98),rgba(235,246,249,.98) 7%,#d6e8ed 14%,#d6e8ed 100%);
   clip-path:polygon(
@@ -226,6 +225,7 @@ body{
     55% 2.20%,67% 1.04%,77% 2.07%,88% 1.29%,100% 2.20%,
     100% 100%,0 100%
   );
+  z-index:10;
   pointer-events:none;
 }
 .tree{
@@ -831,14 +831,14 @@ body{
   .title{letter-spacing:4px}
   .village{width:110vw}
   .ground{top:78%;height:170%}
-  .ground:after{left:98vw;width:100vw}
+  .ground-clone{left:97.5vw;top:78%;height:170%}
   .tree{bottom:14%}
 }
 </style>
 </head>
 <body>
 <div class="scene">
-  <div class="meta"><div class="version">v1.1.17</div><div class="creator">Gemaakt door Keke Zuidinga</div></div>
+  <div class="meta"><div class="version">v1.1.18</div><div class="creator">Gemaakt door Keke Zuidinga</div></div>
   <div class="editor-overlay" id="editorOverlay" aria-hidden="true">
     <div class="editor-panel" role="dialog" aria-modal="true" aria-labelledby="editorHeading">
       <div class="editor-header">
@@ -938,6 +938,7 @@ body{
   <div class="tree t4"><div class="trunk"></div><div class="snow"></div></div>
 
   <div class="ground"></div>
+  <div class="ground-clone"></div>
   <div class="snow-depth"></div>
   <div class="character" id="character" role="button" tabindex="0" aria-label="Praat met Keke">
     <div class="shadow"></div>
@@ -1365,7 +1366,7 @@ document.getElementById("downloadBackup").addEventListener("click",()=>{
   syncEditorToPage();
   const payload={
     app:"Kerst Markt Motivatie",
-    version:"v1.1.17",
+    version:"v1.1.18",
     exportedAt:timestamp(),
     pages:clonePages(pages)
   };
