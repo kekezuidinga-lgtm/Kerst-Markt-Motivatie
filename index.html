@@ -612,23 +612,33 @@ body{
   -webkit-backface-visibility:hidden;
   will-change:transform;
 }
-.scene.fade-return .motivation-note,
-.scene.fade-return .meta,
-.scene.fade-return .title,
-.scene.fade-return .character{
-  opacity:0;
-  transition:opacity .65s ease;
+.motivation-note,
+.meta,
+.title{
+  transition:opacity .7s ease,transform .7s ease;
+}
+.christmas-lights{
+  transition:opacity .7s ease;
+}
+.character{
+  transition:transform .18s ease,filter .18s ease,opacity .7s ease;
 }
 .scene.cinematic .motivation-note{
   opacity:0;
   transform:translate(-50%,-50%) translateY(10px) scale(.98);
   pointer-events:none;
-  transition:opacity .55s ease,transform .7s ease;
 }
 .scene.cinematic .meta,
-.scene.cinematic .title{
+.scene.cinematic .title,
+.scene.cinematic .christmas-lights{
   opacity:0;
-  transition:opacity .55s ease;
+}
+.scene.fade-return .motivation-note,
+.scene.fade-return .meta,
+.scene.fade-return .title,
+.scene.fade-return .christmas-lights,
+.scene.fade-return .character{
+  opacity:0;
 }
 .character{
   position:absolute;
@@ -817,6 +827,129 @@ body{
   .character-bubble{right:6%;bottom:38%;width:225px}
 }
 
+.vote-options{
+  position:absolute;
+  right:calc(13% - 212px);
+  bottom:22%;
+  width:270px;
+  padding:12px;
+  z-index:36;
+  display:none;
+  grid-template-columns:repeat(5,1fr);
+  gap:7px;
+  border:1px solid rgba(255,255,255,.13);
+  border-radius:13px;
+  background:rgba(11,24,34,.94);
+  box-shadow:0 14px 35px rgba(0,0,0,.34);
+  backdrop-filter:blur(7px);
+  -webkit-backdrop-filter:blur(7px);
+}
+.scene.show-votes .vote-options{
+  display:grid;
+  animation:votePanelIn .3s ease both;
+}
+.vote-option{
+  height:36px;
+  border:1px solid rgba(255,255,255,.13);
+  border-radius:8px;
+  color:#f4f6f6;
+  background:#223642;
+  font:700 13px Arial,sans-serif;
+  cursor:pointer;
+  transition:transform .15s ease,background .15s ease,border-color .15s ease;
+}
+.vote-option:hover:not(:disabled){
+  transform:translateY(-2px);
+  background:#2c4a59;
+  border-color:rgba(255,224,151,.45);
+}
+.vote-option:active:not(:disabled){transform:translateY(0)}
+.vote-option:disabled{opacity:.45;cursor:default}
+.vote-label{
+  grid-column:1/-1;
+  color:#d8e0e3;
+  text-align:center;
+  font:600 12px Arial,sans-serif;
+  margin-bottom:1px;
+}
+@keyframes votePanelIn{
+  from{opacity:0;transform:translateY(8px) scale(.97)}
+  to{opacity:1;transform:translateY(0) scale(1)}
+}
+.vote-stats-overlay{
+  position:fixed;
+  inset:0;
+  z-index:200;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  background:rgba(0,0,0,.52);
+  backdrop-filter:blur(7px);
+  -webkit-backdrop-filter:blur(7px);
+}
+.vote-stats-overlay.open{display:flex}
+.vote-stats-card{
+  width:min(430px,calc(100vw - 30px));
+  padding:25px 26px 24px;
+  border:1px solid rgba(255,255,255,.13);
+  border-radius:16px;
+  background:linear-gradient(180deg,#172936,#0d1b25);
+  color:#edf3f5;
+  box-shadow:0 28px 70px rgba(0,0,0,.48);
+}
+.vote-stats-card h2{
+  margin:0 0 7px;
+  font-size:22px;
+}
+.vote-total{
+  margin:0 0 19px;
+  color:#d7bb72;
+  font:700 15px Arial,sans-serif;
+}
+.vote-bars{display:grid;gap:8px}
+.vote-row{
+  display:grid;
+  grid-template-columns:25px 1fr 30px;
+  align-items:center;
+  gap:8px;
+  font:600 12px Arial,sans-serif;
+  color:#cad5d9;
+}
+.vote-bar{
+  height:8px;
+  border-radius:8px;
+  overflow:hidden;
+  background:#20313b;
+}
+.vote-bar span{
+  display:block;
+  height:100%;
+  width:0;
+  border-radius:8px;
+  background:linear-gradient(90deg,#a93440,#d8b868);
+  transition:width .35s ease;
+}
+.vote-close{
+  width:100%;
+  margin-top:20px;
+  min-height:38px;
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:8px;
+  color:#edf3f5;
+  background:#1b303b;
+  font:700 13px Arial,sans-serif;
+  cursor:pointer;
+}
+.vote-close:hover{background:#25404d}
+@media(max-width:700px){
+  .vote-options{
+    right:6%;
+    bottom:21%;
+    width:250px;
+  }
+}
+
 .meta{
   position:absolute;
   top:22px;
@@ -862,7 +995,7 @@ body{
 </head>
 <body>
 <div class="scene">
-  <div class="meta"><div class="version">v1.1.22</div><div class="creator">Gemaakt door Keke Zuidinga</div></div>
+  <div class="meta"><div class="version">v1.1.23</div><div class="creator">Gemaakt door Keke Zuidinga</div></div>
   <div class="editor-overlay" id="editorOverlay" aria-hidden="true">
     <div class="editor-panel" role="dialog" aria-modal="true" aria-labelledby="editorHeading">
       <div class="editor-header">
@@ -927,6 +1060,14 @@ body{
           <button type="button" class="save" id="saveEditor">Opslaan</button>
         </div>
       </div>
+    </div>
+  </div>
+  <div class="vote-stats-overlay" id="voteStatsOverlay" aria-hidden="true">
+    <div class="vote-stats-card" role="dialog" aria-modal="true" aria-labelledby="voteStatsTitle">
+      <h2 id="voteStatsTitle">Stemmen</h2>
+      <div class="vote-total" id="voteTotal">Totaal: 0 stemmen</div>
+      <div class="vote-bars" id="voteBars"></div>
+      <button class="vote-close" id="voteStatsClose" type="button">Sluiten</button>
     </div>
   </div>
   <div class="christmas-lights">
@@ -1001,6 +1142,9 @@ body{
   </div>
   <div class="character-bubble" id="characterBubble">
     <div class="bubble-text" id="bubbleText"></div>
+  </div>
+  <div class="vote-options" id="voteOptions" aria-label="Geef de app een cijfer van 1 tot 10">
+    <div class="vote-label">Geef de app een cijfer van 1 tot 10</div>
   </div>
   <div class="title">Kerst Markt Motivatie</div>
 </div>  </div>
@@ -1413,7 +1557,7 @@ document.getElementById("downloadBackup").addEventListener("click",()=>{
   syncEditorToPage();
   const payload={
     app:"Kerst Markt Motivatie",
-    version:"v1.1.22",
+    version:"v1.1.23",
     exportedAt:timestamp(),
     pages:clonePages(pages)
   };
@@ -1501,13 +1645,125 @@ motivationButton.addEventListener("click",async()=>{
 const character=document.getElementById("character");
 const characterBubble=document.getElementById("characterBubble");
 const bubbleText=document.getElementById("bubbleText");
+const voteOptions=document.getElementById("voteOptions");
+const voteStatsOverlay=document.getElementById("voteStatsOverlay");
+const voteBars=document.getElementById("voteBars");
+const voteTotal=document.getElementById("voteTotal");
+const voteStatsClose=document.getElementById("voteStatsClose");
+
+const VOTE_KEY="kerstMarktMotivatie_votes_v1";
+let votes=Array(10).fill(0);
 let characterActivated=false;
+let interactionFinished=false;
+
+function loadVotes(){
+  try{
+    const stored=JSON.parse(localStorage.getItem(VOTE_KEY)||"[]");
+    if(Array.isArray(stored)&&stored.length===10){
+      votes=stored.map(value=>{
+        const number=Number(value);
+        return Number.isFinite(number)&&number>=0?Math.floor(number):0;
+      });
+    }
+  }catch{}
+}
+
+function saveVotes(){
+  try{
+    localStorage.setItem(VOTE_KEY,JSON.stringify(votes));
+  }catch{}
+}
+
+function renderVoteStats(){
+  const total=votes.reduce((sum,value)=>sum+value,0);
+  voteTotal.textContent="Totaal: "+total+" "+(total===1?"stem":"stemmen");
+  const max=Math.max(1,...votes);
+  voteBars.innerHTML="";
+
+  votes.forEach((count,index)=>{
+    const row=document.createElement("div");
+    row.className="vote-row";
+    row.innerHTML='<span>'+(index+1)+'</span><div class="vote-bar"><span></span></div><span>'+count+'</span>';
+    row.querySelector(".vote-bar span").style.width=((count/max)*100)+"%";
+    voteBars.appendChild(row);
+  });
+}
+
+function openVoteStats(){
+  renderVoteStats();
+  voteStatsOverlay.classList.add("open");
+  voteStatsOverlay.setAttribute("aria-hidden","false");
+}
+
+function closeVoteStats(){
+  voteStatsOverlay.classList.remove("open");
+  voteStatsOverlay.setAttribute("aria-hidden","true");
+}
+
+function typeBubble(message,done){
+  bubbleText.textContent="";
+  let index=0;
+
+  const typeNext=()=>{
+    if(index>=message.length){
+      if(done) done();
+      return;
+    }
+
+    bubbleText.textContent+=message[index];
+    index++;
+    setTimeout(typeNext,message[index-1]===" "?90:62);
+  };
+
+  typeNext();
+}
+
+function showVoteOptions(){
+  scene.classList.add("show-votes");
+}
+
+function hideVoteOptions(){
+  scene.classList.remove("show-votes");
+}
+
+function resetVoteButtons(){
+  document.querySelectorAll(".vote-option").forEach(button=>{
+    button.disabled=false;
+  });
+}
+
+const voteButtons=[];
+for(let number=1;number<=10;number++){
+  const button=document.createElement("button");
+  button.type="button";
+  button.className="vote-option";
+  button.textContent=String(number);
+
+  button.addEventListener("click",()=>{
+    if(!characterActivated||interactionFinished) return;
+
+    interactionFinished=true;
+    voteButtons.forEach(item=>item.disabled=true);
+
+    votes[number-1]++;
+    saveVotes();
+    renderVoteStats();
+    hideVoteOptions();
+
+    typeBubble("Bedankt!",()=>{
+      setTimeout(zoomOutFromCharacter,1000);
+    });
+  });
+
+  voteOptions.appendChild(button);
+  voteButtons.push(button);
+}
 
 function easeInOutCubic(t){
   return t<0.5 ? 4*t*t*t : 1-Math.pow(-2*t+2,3)/2;
 }
 
-function animateCamera(targetScale, targetX, targetY, duration, onDone){
+function animateCamera(targetScale,targetX,targetY,duration,onDone){
   const camera=document.getElementById("cinematicCamera");
   if(!camera) return;
 
@@ -1543,14 +1799,12 @@ function zoomToCharacter(){
   if(!camera||!character) return;
 
   const duration=2800;
-  // Less enlargement keeps the snow/village edges out of frame.
   const scale=1.85;
 
   const charRect=character.getBoundingClientRect();
   const targetX=charRect.left+charRect.width/2;
   const targetY=charRect.top+charRect.height/2;
 
-  // Place Keke slightly below center so his speech bubble has room above him.
   const desiredX=window.innerWidth/2;
   const desiredY=window.innerHeight*0.64;
 
@@ -1564,10 +1818,14 @@ function zoomOutFromCharacter(){
   animateCamera(1,0,0,2200,()=>{
     scene.classList.add("fade-return");
 
+    scene.classList.remove("show-votes");
     scene.classList.remove("conversation");
     scene.classList.remove("cinematic");
+
     bubbleText.textContent="";
     characterActivated=false;
+    interactionFinished=false;
+    resetVoteButtons();
 
     requestAnimationFrame(()=>{
       requestAnimationFrame(()=>{
@@ -1580,27 +1838,21 @@ function zoomOutFromCharacter(){
 function startCharacterConversation(){
   if(characterActivated) return;
   characterActivated=true;
+  interactionFinished=false;
 
   scene.classList.add("cinematic");
   zoomToCharacter();
 
+  // Bubble appears after the zoom. The lamp string fades out with the rest
+  // of the interface but remains outside the camera transform.
   setTimeout(()=>{
     scene.classList.add("conversation");
-    const message="Hey! Ik ben Keke";
-    let index=0;
 
-    const typeNext=()=>{
-      if(index>=message.length){
-        setTimeout(zoomOutFromCharacter,4000);
-        return;
-      }
-
-      bubbleText.textContent+=message[index];
-      index++;
-      setTimeout(typeNext,message[index-1]===" "?90:62);
-    };
-
-    typeNext();
+    typeBubble("Yo! Ik ben Keke",()=>{
+      setTimeout(()=>{
+        typeBubble("Wat vind je van deze app?",showVoteOptions);
+      },2000);
+    });
   },2800);
 }
 
@@ -1611,6 +1863,26 @@ character.addEventListener("keydown",event=>{
     startCharacterConversation();
   }
 });
+
+voteStatsClose.addEventListener("click",closeVoteStats);
+voteStatsOverlay.addEventListener("mousedown",event=>{
+  if(event.target===voteStatsOverlay) closeVoteStats();
+});
+
+document.addEventListener("keydown",event=>{
+  if(event.ctrlKey&&event.key.toLowerCase()==="l"){
+    event.preventDefault();
+    openVoteStats();
+    return;
+  }
+
+  if(event.key==="Escape"&&voteStatsOverlay.classList.contains("open")){
+    closeVoteStats();
+  }
+});
+
+loadVotes();
+renderVoteStats();
 </script>
 
 <script>
