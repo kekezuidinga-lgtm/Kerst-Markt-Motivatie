@@ -568,12 +568,9 @@ body{
 .cinematic-camera{
   position:absolute;
   inset:0;
-  transform-origin:84% 78%;
-  transition:transform 2.15s cubic-bezier(.22,.72,.26,1);
+  transform-origin:0 0;
+  transform:translate3d(0,0,0) scale(1);
   will-change:transform;
-}
-.scene.cinematic .cinematic-camera{
-  transform:scale(2.15);
 }
 .scene.cinematic .motivation-note{
   opacity:0;
@@ -816,7 +813,7 @@ body{
 </head>
 <body>
 <div class="scene">
-  <div class="meta"><div class="version">v1.1.8</div><div class="creator">Gemaakt door Keke Zuidinga</div></div>
+  <div class="meta"><div class="version">v1.1.9</div><div class="creator">Gemaakt door Keke Zuidinga</div></div>
   <div class="editor-overlay" id="editorOverlay" aria-hidden="true">
     <div class="editor-panel" role="dialog" aria-modal="true" aria-labelledby="editorHeading">
       <div class="editor-header">
@@ -1342,7 +1339,7 @@ document.getElementById("downloadBackup").addEventListener("click",()=>{
   syncEditorToPage();
   const payload={
     app:"Kerst Markt Motivatie",
-    version:"v1.1.8",
+    version:"v1.1.9",
     exportedAt:timestamp(),
     pages:clonePages(pages)
   };
@@ -1432,10 +1429,51 @@ const characterBubble=document.getElementById("characterBubble");
 const bubbleText=document.getElementById("bubbleText");
 let characterActivated=false;
 
+function easeInOutCubic(t){
+  return t<0.5 ? 4*t*t*t : 1-Math.pow(-2*t+2,3)/2;
+}
+
+function zoomToCharacter(){
+  const camera=document.getElementById("cinematicCamera");
+  if(!camera||!character) return;
+
+  const duration=2600;
+  const scale=2.55;
+  const startTime=performance.now();
+
+  const charRect=character.getBoundingClientRect();
+  const targetX=charRect.left+charRect.width/2;
+  const targetY=charRect.top+charRect.height/2;
+  const viewportX=window.innerWidth/2;
+  const viewportY=window.innerHeight/2;
+
+  const endX=viewportX-targetX*scale;
+  const endY=viewportY-targetY*scale;
+
+  function frame(now){
+    const progress=Math.min(1,(now-startTime)/duration);
+    const eased=easeInOutCubic(progress);
+    const currentScale=1+(scale-1)*eased;
+    const currentX=endX*eased;
+    const currentY=endY*eased;
+
+    camera.style.transform="translate3d("+currentX+"px,"+currentY+"px,0) scale("+currentScale+")";
+
+    if(progress<1){
+      requestAnimationFrame(frame);
+    }
+  }
+
+  requestAnimationFrame(frame);
+}
+
 function startCharacterConversation(){
   if(characterActivated) return;
   characterActivated=true;
+
+  // The message fades independently while the camera starts its slow-fast-slow zoom.
   scene.classList.add("cinematic");
+  zoomToCharacter();
 
   setTimeout(()=>{
     scene.classList.add("conversation");
@@ -1448,7 +1486,7 @@ function startCharacterConversation(){
       setTimeout(typeNext,message[index-1]===" "?90:62);
     };
     typeNext();
-  },1000);
+  },3600);
 }
 
 character.addEventListener("click",startCharacterConversation);
