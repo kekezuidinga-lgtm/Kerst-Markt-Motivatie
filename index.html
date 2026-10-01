@@ -563,6 +563,219 @@ body{
 }
 .editor-backup-row button:hover{background:#213744}
 
+
+.cinematic-world{
+  position:absolute;
+  inset:0;
+  transform-origin:84% 76%;
+  transition:transform 1.8s cubic-bezier(.18,.72,.27,1);
+}
+.scene.cinematic .cinematic-world{
+  transform:scale(2.35);
+}
+.scene.cinematic .motivation-note{
+  opacity:0;
+  transform:translate(-50%,-50%) scale(.97);
+  pointer-events:none;
+  transition:opacity .55s ease,transform .7s ease;
+}
+.scene.cinematic .meta,
+.scene.cinematic .title{
+  opacity:0;
+  transition:opacity .55s ease;
+}
+.character{
+  position:absolute;
+  right:14%;
+  bottom:17%;
+  width:58px;
+  height:112px;
+  z-index:30;
+  cursor:pointer;
+  user-select:none;
+  outline:none;
+  filter:drop-shadow(0 8px 10px rgba(0,0,0,.32));
+  transition:transform .18s ease,filter .18s ease;
+}
+.character:hover{
+  transform:translateY(-3px) scale(1.04);
+  filter:drop-shadow(0 11px 14px rgba(0,0,0,.38));
+}
+.character:focus-visible{
+  outline:2px solid rgba(255,227,155,.9);
+  outline-offset:5px;
+  border-radius:10px;
+}
+.character .shadow{
+  position:absolute;
+  left:50%;
+  bottom:-4px;
+  width:56px;
+  height:11px;
+  transform:translateX(-50%);
+  border-radius:50%;
+  background:rgba(0,0,0,.26);
+  filter:blur(4px);
+}
+.character .body{
+  position:absolute;
+  left:11px;
+  bottom:19px;
+  width:37px;
+  height:55px;
+  border-radius:14px 14px 10px 10px;
+  background:linear-gradient(90deg,#174c37 0%,#28694a 52%,#14392c 100%);
+  box-shadow:inset -5px 0 0 rgba(0,0,0,.14);
+}
+.character .scarf{
+  position:absolute;
+  left:7px;
+  bottom:56px;
+  width:45px;
+  height:10px;
+  border-radius:7px;
+  background:#9b3039;
+}
+.character .scarf-tail{
+  position:absolute;
+  left:30px;
+  bottom:32px;
+  width:9px;
+  height:34px;
+  border-radius:0 0 6px 6px;
+  background:#84262f;
+  transform:rotate(8deg);
+}
+.character .head{
+  position:absolute;
+  left:15px;
+  bottom:69px;
+  width:29px;
+  height:31px;
+  border-radius:50%;
+  background:linear-gradient(145deg,#f5caa7,#d99770);
+}
+.character .hat{
+  position:absolute;
+  left:9px;
+  bottom:90px;
+  width:41px;
+  height:24px;
+  border-radius:20px 20px 7px 7px;
+  background:linear-gradient(180deg,#bd3b48,#79242f);
+  transform:rotate(-3deg);
+}
+.character .hat:before{
+  content:"";
+  position:absolute;
+  left:1px;
+  bottom:-4px;
+  width:39px;
+  height:8px;
+  border-radius:8px;
+  background:#f3f5f2;
+}
+.character .hat:after{
+  content:"";
+  position:absolute;
+  right:-5px;
+  top:-6px;
+  width:10px;
+  height:10px;
+  border-radius:50%;
+  background:#f3f5f2;
+}
+.character .eye{
+  position:absolute;
+  bottom:81px;
+  width:3px;
+  height:3px;
+  border-radius:50%;
+  background:#273038;
+}
+.character .eye.left{left:22px}
+.character .eye.right{left:33px}
+.character .nose{
+  position:absolute;
+  left:27px;
+  bottom:77px;
+  width:5px;
+  height:4px;
+  background:#b86b50;
+  clip-path:polygon(0 50%,100% 0,100% 100%);
+}
+.character .arm{
+  position:absolute;
+  bottom:31px;
+  width:9px;
+  height:31px;
+  border-radius:8px;
+  background:#1d513d;
+}
+.character .arm.left{left:5px;transform:rotate(12deg)}
+.character .arm.right{right:5px;transform:rotate(-12deg)}
+.character .leg{
+  position:absolute;
+  bottom:4px;
+  width:11px;
+  height:19px;
+  border-radius:0 0 5px 5px;
+  background:#24343e;
+}
+.character .leg.left{left:17px}
+.character .leg.right{left:33px}
+.character-bubble{
+  position:absolute;
+  right:calc(14% - 210px);
+  bottom:39%;
+  width:255px;
+  min-height:54px;
+  padding:14px 16px;
+  z-index:35;
+  border-radius:17px 17px 17px 5px;
+  background:#fffdf8;
+  color:#25343b;
+  border:1px solid rgba(44,54,58,.13);
+  box-shadow:0 14px 34px rgba(0,0,0,.30);
+  opacity:0;
+  transform:translateY(12px) scale(.94);
+  pointer-events:none;
+}
+.character-bubble:after{
+  content:"";
+  position:absolute;
+  left:17px;
+  bottom:-9px;
+  width:18px;
+  height:18px;
+  background:#fffdf8;
+  border-right:1px solid rgba(44,54,58,.10);
+  border-bottom:1px solid rgba(44,54,58,.10);
+  transform:rotate(45deg);
+}
+.character-bubble .bubble-text{
+  min-height:24px;
+  font:600 16px/1.45 Arial,sans-serif;
+}
+.scene.conversation .character-bubble{
+  animation:bubbleIn .38s cubic-bezier(.18,.9,.25,1) forwards;
+}
+.scene.conversation .character{
+  pointer-events:none;
+}
+@keyframes bubbleIn{
+  to{opacity:1;transform:translateY(0) scale(1)}
+}
+@media(max-width:700px){
+  .scene.cinematic .cinematic-world{transform:scale(2.15)}
+  .character{right:11%;bottom:16%;transform:scale(.9)}
+  .character-bubble{
+    right:7%;
+    bottom:40%;
+    width:225px;
+  }
+}
+
 .meta{
   position:absolute;
   top:22px;
@@ -605,7 +818,7 @@ body{
 </head>
 <body>
 <div class="scene">
-  <div class="meta"><div class="version">v1.1.6</div><div class="creator">Gemaakt door Keke Zuidinga</div></div>
+  <div class="meta"><div class="version">v1.1.7</div><div class="creator">Gemaakt door Keke Zuidinga</div></div>
   <div class="editor-overlay" id="editorOverlay" aria-hidden="true">
     <div class="editor-panel" role="dialog" aria-modal="true" aria-labelledby="editorHeading">
       <div class="editor-header">
@@ -673,6 +886,7 @@ body{
     </div>
   </div>
   <div class="christmas-lights">
+  <div class="cinematic-world" id="cinematicWorld">
     <span class="light"></span><span class="light"></span><span class="light"></span><span class="light"></span>
     <span class="light"></span><span class="light"></span><span class="light"></span><span class="light"></span>
   </div>
@@ -705,6 +919,23 @@ body{
 
   <div class="ground"></div>
   <div class="title">Kerst Markt Motivatie</div>
+
+    <div class="character" id="character" role="button" tabindex="0" aria-label="Praat met Keke">
+      <div class="shadow"></div>
+      <div class="body"></div>
+      <div class="scarf"></div>
+      <div class="scarf-tail"></div>
+      <div class="head"></div>
+      <div class="hat"></div>
+      <div class="eye left"></div><div class="eye right"></div>
+      <div class="nose"></div>
+      <div class="arm left"></div><div class="arm right"></div>
+      <div class="leg left"></div><div class="leg right"></div>
+    </div>
+    <div class="character-bubble" id="characterBubble">
+      <div class="bubble-text" id="bubbleText"></div>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -1201,6 +1432,40 @@ motivationButton.addEventListener("click",async()=>{
 
 <script>
 const scene=document.querySelector(".scene");
+
+const character=document.getElementById("character");
+const characterBubble=document.getElementById("characterBubble");
+const bubbleText=document.getElementById("bubbleText");
+let characterActivated=false;
+
+function startCharacterConversation(){
+  if(characterActivated) return;
+  characterActivated=true;
+  scene.classList.add("cinematic");
+
+  setTimeout(()=>{
+    scene.classList.add("conversation");
+    const message="Hey! Ik ben Keke";
+    let index=0;
+    const typeNext=()=>{
+      if(index>=message.length) return;
+      bubbleText.textContent+=message[index];
+      index++;
+      setTimeout(typeNext,message[index-1]===" "?90:62);
+    };
+    typeNext();
+  },1000);
+}
+
+character.addEventListener("click",startCharacterConversation);
+character.addEventListener("keydown",event=>{
+  if(event.key==="Enter"||event.key===" "){
+    event.preventDefault();
+    startCharacterConversation();
+  }
+});
+
+
 const symbols=["❄","•","✦"];
 for(let i=0;i<100;i++){
   const s=document.createElement("div");
