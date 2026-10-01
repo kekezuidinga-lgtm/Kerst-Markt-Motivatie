@@ -1006,7 +1006,7 @@ body{
 </head>
 <body>
 <div class="scene">
-  <div class="meta"><div class="version">v1.1.30</div><div class="creator">Gemaakt door Keke Zuidinga</div></div>
+  <div class="meta"><div class="version">v1.1.31</div><div class="creator">Gemaakt door Keke Zuidinga</div></div>
   <div class="editor-overlay" id="editorOverlay" aria-hidden="true">
     <div class="editor-panel" role="dialog" aria-modal="true" aria-labelledby="editorHeading">
       <div class="editor-header">
@@ -1445,6 +1445,14 @@ function renderMotivationPage(index=currentPage){
   noteText.innerHTML=pages[currentPage].message||"";
   motivationButton.style.display="none";
   nextPageButton.style.display=pages.length>currentPage+1?"inline-block":"none";
+
+  if(window.showFinalCharacterHint){
+    if(currentPage===pages.length-1){
+      window.showFinalCharacterHint();
+    }else if(window.hideFinalCharacterHint){
+      window.hideFinalCharacterHint();
+    }
+  }
 }
 
 function loadEditorPage(){
@@ -1568,7 +1576,7 @@ document.getElementById("downloadBackup").addEventListener("click",()=>{
   syncEditorToPage();
   const payload={
     app:"Kerst Markt Motivatie",
-    version:"v1.1.25",
+    version:"v1.1.31",
     exportedAt:timestamp(),
     pages:clonePages(pages)
   };
@@ -1732,6 +1740,9 @@ function typeBubble(message,done){
   typeNext();
 }
 
+window.showFinalCharacterHint=showFinalCharacterHint;
+window.hideFinalCharacterHint=hideFinalCharacterHint;
+
 function showVoteOptions(){
   scene.classList.add("show-votes");
 }
@@ -1862,6 +1873,38 @@ function stopCharacterHint(){
   try{localStorage.setItem("kerstMarktMotivatie_kekeHintDone_v1","1");}catch{}
 }
 
+function showFinalCharacterHint(){
+  if(characterActivated) return;
+
+  if(hintTimer){
+    clearTimeout(hintTimer);
+    hintTimer=null;
+  }
+
+  hintVisible=false;
+  scene.classList.remove("bubble-pop-out");
+  bubbleText.textContent="Klik mij!";
+  scene.classList.add("hint-active");
+}
+
+function hideFinalCharacterHint(){
+  if(characterActivated) return;
+
+  scene.classList.remove("hint-active");
+  scene.classList.add("bubble-pop-out");
+
+  setTimeout(()=>{
+    if(!characterActivated && !scene.classList.contains("hint-active")){
+      bubbleText.textContent="";
+    }
+    scene.classList.remove("bubble-pop-out");
+  },280);
+
+  if(!hintStopped && !hintTimer){
+    hintTimer=setTimeout(runCharacterHint,5000);
+  }
+}
+
 function runCharacterHint(){
   if(hintStopped||characterActivated) return;
   hintVisible=!hintVisible;
@@ -1902,7 +1945,7 @@ function startCharacterConversation(){
         scene.classList.add("bubble-pop-out");
         setTimeout(()=>{
           scene.classList.remove("bubble-pop-out");
-          typeBubble("Wat vind je van deze app?",showVoteOptions);
+          typeBubble("Welk cijfer geef jij mijn motivatie?",showVoteOptions);
         },280);
       },2000);
     });
