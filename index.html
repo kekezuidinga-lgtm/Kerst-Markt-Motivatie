@@ -200,8 +200,8 @@ body{
 .ground{
   position:absolute;
   left:0;
-  right:0;
   top:78%;
+  width:100vw;
   height:170%;
   background:
     radial-gradient(ellipse at 50% 1%,rgba(255,255,255,.98),rgba(235,246,249,.98) 7%,#d6e8ed 14%,#d6e8ed 100%);
@@ -211,6 +211,22 @@ body{
     100% 100%,0 100%
   );
   z-index:10;
+}
+.ground:after{
+  content:"";
+  position:absolute;
+  left:98vw;
+  top:0;
+  width:100vw;
+  height:100%;
+  background:
+    radial-gradient(ellipse at 50% 1%,rgba(255,255,255,.98),rgba(235,246,249,.98) 7%,#d6e8ed 14%,#d6e8ed 100%);
+  clip-path:polygon(
+    0 2.12%,7% 1.81%,15% 2.47%,24% 1.42%,34% 2.12%,44% 1.29%,
+    55% 2.20%,67% 1.04%,77% 2.07%,88% 1.29%,100% 2.20%,
+    100% 100%,0 100%
+  );
+  pointer-events:none;
 }
 .tree{
   position:absolute;bottom:12%;width:0;height:0;
@@ -815,13 +831,14 @@ body{
   .title{letter-spacing:4px}
   .village{width:110vw}
   .ground{top:78%;height:170%}
+  .ground:after{left:98vw;width:100vw}
   .tree{bottom:14%}
 }
 </style>
 </head>
 <body>
 <div class="scene">
-  <div class="meta"><div class="version">v1.1.16</div><div class="creator">Gemaakt door Keke Zuidinga</div></div>
+  <div class="meta"><div class="version">v1.1.17</div><div class="creator">Gemaakt door Keke Zuidinga</div></div>
   <div class="editor-overlay" id="editorOverlay" aria-hidden="true">
     <div class="editor-panel" role="dialog" aria-modal="true" aria-labelledby="editorHeading">
       <div class="editor-header">
@@ -1348,7 +1365,7 @@ document.getElementById("downloadBackup").addEventListener("click",()=>{
   syncEditorToPage();
   const payload={
     app:"Kerst Markt Motivatie",
-    version:"v1.1.16",
+    version:"v1.1.17",
     exportedAt:timestamp(),
     pages:clonePages(pages)
   };
